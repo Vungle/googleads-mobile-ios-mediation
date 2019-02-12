@@ -1,5 +1,11 @@
 # Nend Adapter for Google Mobile Ads SDK for iOS
 
+## Version 5.1.0.0
+- Verified compatibility with nend SDK 5.1.0.
+
+## Version 5.0.3.0
+- Verified compatibility with nend SDK 5.0.3.
+
 ## Version 5.0.2.0
 - Verified compatibility with nend SDK 5.0.2.
 
