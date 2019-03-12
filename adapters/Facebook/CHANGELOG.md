@@ -1,5 +1,16 @@
 # Facebook Audience Network Mediation Adapter for Google Mobile Ads SDK for iOS
 
+## Version 5.2.0.1
+- Updated the adapter to use the new rewarded API.
+- Now requires Google Mobile Ads SDK version 7.41.0 or higher.
+
+## Version 5.2.0.0
+- Verified compatibility with FAN SDK 5.2.0.
+- Replaced FBAdChoicesView with FBAdOptionsView.
+
+## Version 5.1.1.1
+- Added support to populate advertiser name asset for Unified Native Ads.
+
 ## Version 5.1.1.0
 - Verified compatibility with FAN SDK 5.1.1.
 
