@@ -25,7 +25,7 @@
 @property(nonatomic, strong) GADMediationBannerAdConfiguration *adConfiguration;
 
 /// Callback object to notify the Google Mobile Ads SDK if ad rendering succeeded or failed.
-@property(nonatomic, copy) GADBannerLoadCompletionHandler adLoadCompletionHandler;
+@property(nonatomic, copy) GADMediationBannerLoadCompletionHandler adLoadCompletionHandler;
 
 /// Delegate to notify the Google Mobile Ads SDK of banner presentation events.
 @property(nonatomic, strong, nullable) id<GADMediationBannerAdEventDelegate> delegate;
@@ -40,7 +40,7 @@
 @implementation GADMRTBAdapterAppLovinBannerRenderer
 
 - (instancetype)initWithAdConfiguration:(GADMediationBannerAdConfiguration *)adConfiguration
-                      completionHandler:(GADBannerLoadCompletionHandler)handler {
+                      completionHandler:(GADMediationBannerLoadCompletionHandler)handler {
   self = [super init];
   if (self) {
     self.adConfiguration = adConfiguration;
@@ -83,6 +83,11 @@
   return self.adView;
 }
 
+- (void)dealloc {
+  self.adView.adDisplayDelegate = nil;
+  self.adView.adEventDelegate = nil;
+}
+
 @end
 
 @implementation GADMAppLovinRtbBannerDelegate
@@ -104,7 +109,9 @@
 
   GADMRTBAdapterAppLovinBannerRenderer *parentRenderer = self.parentRenderer;
   dispatch_async(dispatch_get_main_queue(), ^{
-    parentRenderer.delegate = parentRenderer.adLoadCompletionHandler(parentRenderer, nil);
+    if (parentRenderer.adLoadCompletionHandler) {
+      parentRenderer.delegate = parentRenderer.adLoadCompletionHandler(parentRenderer, nil);
+    }
   });
   [parentRenderer.adView render:ad];
 }
@@ -115,7 +122,9 @@
   NSError *error = [NSError errorWithDomain:GADMAdapterAppLovinConstant.rtbErrorDomain
                                        code:[GADMAdapterAppLovinUtils toAdMobErrorCode:code]
                                    userInfo:nil];
-  self.parentRenderer.adLoadCompletionHandler(nil, error);
+  if (_parentRenderer.adLoadCompletionHandler) {
+    self.parentRenderer.adLoadCompletionHandler(nil, error);
+  }
 }
 
 #pragma mark - Ad Display Delegate

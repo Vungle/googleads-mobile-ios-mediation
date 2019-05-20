@@ -26,7 +26,7 @@
 @property(nonatomic, strong) GADMediationInterstitialAdConfiguration *adConfiguration;
 
 /// Callback object to notify the Google Mobile Ads SDK if ad rendering succeeded or failed.
-@property(nonatomic, copy) GADInterstitialLoadCompletionHandler adLoadCompletionHandler;
+@property(nonatomic, copy) GADMediationInterstitialLoadCompletionHandler adLoadCompletionHandler;
 
 /// Delegate to notify the Google Mobile Ads SDK of interstitial presentation events.
 @property(nonatomic, strong, nullable) id<GADMediationInterstitialAdEventDelegate> delegate;
@@ -41,7 +41,7 @@
 @implementation GADMRTBAdapterAppLovinInterstitialRenderer
 
 - (instancetype)initWithAdConfiguration:(GADMediationInterstitialAdConfiguration *)adConfiguration
-                      completionHandler:(GADInterstitialLoadCompletionHandler)handler {
+                      completionHandler:(GADMediationInterstitialLoadCompletionHandler)handler {
   self = [super init];
   if (self) {
     self.adConfiguration = adConfiguration;
@@ -76,6 +76,11 @@
   [self.interstitialAd showOver:[UIApplication sharedApplication].keyWindow andRender:self.ad];
 }
 
+- (void)dealloc {
+  self.interstitialAd.adDisplayDelegate = nil;
+  self.interstitialAd.adVideoPlaybackDelegate = nil;
+}
+
 @end
 
 @implementation GADMAppLovinRtbInterstitialDelegate
@@ -99,7 +104,9 @@
   GADMRTBAdapterAppLovinInterstitialRenderer *parentRenderer = self.parentRenderer;
   parentRenderer.ad = ad;
   dispatch_async(dispatch_get_main_queue(), ^{
-    parentRenderer.delegate = parentRenderer.adLoadCompletionHandler(parentRenderer, nil);
+    if (parentRenderer.adLoadCompletionHandler) {
+      parentRenderer.delegate = parentRenderer.adLoadCompletionHandler(parentRenderer, nil);
+    }
   });
 }
 
@@ -109,7 +116,9 @@
   NSError *error = [NSError errorWithDomain:GADMAdapterAppLovinConstant.rtbErrorDomain
                                        code:[GADMAdapterAppLovinUtils toAdMobErrorCode:code]
                                    userInfo:nil];
-  self.parentRenderer.adLoadCompletionHandler(nil, error);
+  if (_parentRenderer.adLoadCompletionHandler) {
+    self.parentRenderer.adLoadCompletionHandler(nil, error);
+  }
 }
 
 #pragma mark - Ad Display Delegate
