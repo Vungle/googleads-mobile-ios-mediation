@@ -1,4 +1,4 @@
-// Copyright 2016 Google Inc.
+// Copyright 2019 Google Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// Facebook mediation network adapter version.
-static NSString *const kGADMAdapterFacebookVersion = @"5.3.2.0";
+static NSString *const kGADMAdapterDuAdVersion = @"1.1.2.1";
 
-static NSString *const kGADMAdapterFacebookOpenBiddingPubID = @"placement_id";
+static NSString *const kGADMAdapterDuAdAppID = @"appId";
 
-static NSString *const kGADMAdapterFacebookPubID = @"pubid";
+static NSString *const kGADMAdapterDuAdPlacementID = @"placementId";
+
+static NSString *const kGADMAdapterDuAdErrorDomain = @"com.google.mediation.duad";
