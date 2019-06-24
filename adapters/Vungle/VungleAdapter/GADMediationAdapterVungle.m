@@ -20,9 +20,10 @@
   NSString *applicationID = [applicationIDs anyObject];
 
   if (applicationIDs.count != 1) {
-    NSLog(@"Found the following application IDs: %@. Please remove any application IDs you are not "
-          @"using from the AdMob UI.",
-          applicationIDs);
+    NSLog(
+        @"Found the following application IDs: %@. Please remove any application IDs you are not "
+        @"using from the AdMob UI.",
+        applicationIDs);
     NSLog(@"Configuring AdColony SDK with the application ID %@.", applicationID);
   }
 

@@ -23,8 +23,9 @@
   NSString *ret = [serverParameters objectForKey:kGADMAdapterVunglePlacementID];
   if (networkExtras && networkExtras.playingPlacement) {
     if (ret) {
-      NSLog(@"'placementID' had a value in both serverParameters and networkExtras. Used one from "
-            @"serverParameters");
+      NSLog(
+          @"'placementID' had a value in both serverParameters and networkExtras. Used one from "
+          @"serverParameters");
     } else {
       ret = networkExtras.playingPlacement;
     }
