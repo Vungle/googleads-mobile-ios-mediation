@@ -7,7 +7,9 @@
 @property(strong) NSMapTable<NSString *, id<VungleDelegate>> *initializingDelegates;
 @property(strong) NSMapTable<NSString *, id<VungleDelegate>> *bannerDelegates;
 @property(nonatomic, assign) BOOL isMrecPlaying;
+@property(nonatomic, assign) BOOL isBannerPlaying;
 @property(nonatomic, copy) NSString *mrecPlacementID;
+@property(nonatomic, copy) NSString *bannerPlacementID;
 @end
 
 @implementation VungleRouter
@@ -64,6 +66,7 @@
 
   _isInitialising = true;
   _isMrecPlaying = NO;
+  _isBannerPlaying = NO;
 
   NSError *err = nil;
   [sdk startWithAppId:appId error:&err];
@@ -87,9 +90,13 @@
         [self.delegates setObject:delegate forKey:delegate.desiredPlacement];
       }
     }
-  } else if (delegate.adapterAdType == MREC) {
+  } else if (delegate.adapterAdType == MREC || delegate.adapterAdType == Banner || delegate.adapterAdType == LeaderboardBanner) {
     @synchronized(self.bannerDelegates) {
-      self.mrecPlacementID = [delegate.desiredPlacement copy];
+        if (delegate.adapterAdType == MREC) {
+            self.mrecPlacementID = [delegate.desiredPlacement copy];
+        } else {
+            self.bannerPlacementID = [delegate.desiredPlacement copy];
+        }
       if (delegate && ![self.bannerDelegates objectForKey:delegate.desiredPlacement]) {
         [self.bannerDelegates setObject:delegate forKey:delegate.desiredPlacement];
       }
@@ -99,7 +106,7 @@
 
 - (id<VungleDelegate>)getDelegateForPlacement:(NSString *)placement {
   id<VungleDelegate> delegate;
-  if ([placement isEqualToString:self.mrecPlacementID]) {
+  if ([placement isEqualToString:self.mrecPlacementID] || [placement isEqualToString:self.bannerPlacementID]) {
     @synchronized(self.bannerDelegates) {
       if ([self.bannerDelegates objectForKey:placement]) {
         delegate = [self.bannerDelegates objectForKey:placement];
@@ -157,8 +164,9 @@
   return result;
 }
 
-- (BOOL)canRequestBannerAdForPlacementID:(NSString *)placmentID {
-  return self.mrecPlacementID == nil || [self.mrecPlacementID isEqualToString:placmentID];
+- (BOOL)canRequestBannerAdForPlacementID:(NSString *)placmentID withBannerType:(VungleNetworkAdapterAdType)bannerType{
+    NSString *placement = (bannerType == MREC ? _mrecPlacementID : _bannerPlacementID);
+    return placement == nil || [placement isEqualToString:placmentID];
 }
 
 - (NSError *)loadAd:(NSString *)placement withDelegate:(id<VungleDelegate>)delegate {
@@ -181,13 +189,22 @@
     [delegate adAvailable];
   } else {
     NSError *loadError;
-    if (![sdk loadPlacementWithID:placement error:&loadError]) {
-      if (loadError) {
-        return loadError;
-      }
+    VungleNetworkAdapterAdType adType = [delegate adapterAdType];
+    if (adType != Banner && adType != LeaderboardBanner) {
+        if (![sdk loadPlacementWithID:placement error:&loadError]) {
+              if (loadError) {
+                  return loadError;
+              }
+          }
+    } else {
+        if (![sdk loadPlacementWithID:placement withSize:(adType == Banner ? kGADAdSizeBanner : kGADAdSizeLeaderboard).size error:&loadError]) {
+            if (loadError) {
+                return loadError;
+            }
+        }
     }
   }
-
+    
   return nil;
 }
 

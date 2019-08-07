@@ -2,7 +2,7 @@
 #import <VungleSDK/VungleSDK.h>
 #import "VungleAdNetworkExtras.h"
 
-typedef NS_ENUM(NSUInteger, VungleNetworkAdapterAdType) { Unknown, Rewarded, Interstitial, MREC };
+typedef NS_ENUM(NSUInteger, VungleNetworkAdapterAdType) { Unknown, Rewarded, Interstitial, MREC, Banner, LeaderboardBanner };
 
 typedef NS_ENUM(NSUInteger, BannerRouterDelegateState) {
   BannerRouterDelegateStateRequesting,
@@ -42,5 +42,5 @@ typedef NS_ENUM(NSUInteger, BannerRouterDelegateState) {
                           extras:(VungleAdNetworkExtras *)extras
                   forPlacementID:(NSString *)placementID;
 - (void)completeBannerAdViewForPlacementID:(NSString *)placementID;
-- (BOOL)canRequestBannerAdForPlacementID:(NSString *)placmentID;
+- (BOOL)canRequestBannerAdForPlacementID:(NSString *)placmentID withBannerType:(VungleNetworkAdapterAdType)bannerType;
 @end

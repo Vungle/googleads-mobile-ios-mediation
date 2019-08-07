@@ -37,10 +37,8 @@ static BOOL _isAdPresenting;
 #pragma mark - GAD Ad Network Protocol Banner Methods (MREC)
 
 - (void)getBannerWithSize:(GADAdSize)adSize {
-  self.adapterAdType = MREC;
-
   // Check if given banner size is in MREC.
-  if (!CGSizeEqualToSize(adSize.size, kGADAdSizeMediumRectangle.size)) {
+  if (!CGSizeEqualToSize(adSize.size, kGADAdSizeMediumRectangle.size) && !CGSizeEqualToSize(adSize.size, kGADAdSizeBanner.size) && !CGSizeEqualToSize(adSize.size, kGADAdSizeLeaderboard.size)) {
     NSError *error = [NSError
         errorWithDomain:kGADMAdapterVungleErrorDomain
                    code:0
@@ -50,6 +48,14 @@ static BOOL _isAdPresenting;
     [self.connector adapter:self didFailAd:error];
     return;
   }
+    
+    if (CGSizeEqualToSize(adSize.size, kGADAdSizeMediumRectangle.size)) {
+        self.adapterAdType = MREC;
+    } else if (CGSizeEqualToSize(adSize.size, kGADAdSizeBanner.size)) {
+        self.adapterAdType = Banner;
+    } else if (!CGSizeEqualToSize(adSize.size, kGADAdSizeLeaderboard.size)) {
+        self.adapterAdType = LeaderboardBanner;
+    }
 
   id<GADMAdNetworkConnector> strongConnector = self.connector;
   self.desiredPlacement = [GADMAdapterVungleUtils findPlacement:[strongConnector credentials]
@@ -68,7 +74,7 @@ static BOOL _isAdPresenting;
 
   // Check if a banner (MREC) ad has been initiated with the samne PlacementID
   // or not. (Vungle supports only one banner currently.)
-  if (![[VungleRouter sharedInstance] canRequestBannerAdForPlacementID:self.desiredPlacement]) {
+  if (![[VungleRouter sharedInstance] canRequestBannerAdForPlacementID:self.desiredPlacement withBannerType:self.adapterAdType]) {
     NSError *error =
         [NSError errorWithDomain:@"google"
                             code:0
@@ -151,7 +157,7 @@ static BOOL _isAdPresenting;
 }
 
 - (void)stopBeingDelegate {
-  if (self.adapterAdType == MREC) {
+  if ([self isBannerAd]) {
     [[VungleRouter sharedInstance] completeBannerAdViewForPlacementID:self.desiredPlacement];
     self.connector = nil;
     [[VungleRouter sharedInstance] removeDelegate:self];
@@ -185,16 +191,24 @@ static BOOL _isAdPresenting;
 }
 
 - (void)connectAdViewToViewController {
-  UIView *mrecAdView =
-      [[UIView alloc] initWithFrame:CGRectMake(0, 0, kGADAdSizeMediumRectangle.size.width,
-                                               kGADAdSizeMediumRectangle.size.height)];
-  mrecAdView = [[VungleRouter sharedInstance] renderBannerAdInView:mrecAdView
+  GADAdSize size;
+  if (self.adapterAdType == Banner) {
+    size = kGADAdSizeBanner;
+  } else if (self.adapterAdType == LeaderboardBanner) {
+    size = kGADAdSizeLeaderboard;
+  } else if (self.adapterAdType == MREC) {
+    size = kGADAdSizeMediumRectangle;
+  }
+    
+  UIView *bannerView =
+      [[UIView alloc] initWithFrame:CGRectMake(0, 0, size.size.width, size.size.height)];
+  bannerView = [[VungleRouter sharedInstance] renderBannerAdInView:bannerView
                                                           delegate:self
                                                             extras:[self.connector networkExtras]
                                                     forPlacementID:self.desiredPlacement];
-  if (mrecAdView) {
+  if (bannerView) {
     self.bannerState = BannerRouterDelegateStatePlaying;
-    [self.connector adapter:self didReceiveAdView:mrecAdView];
+    [self.connector adapter:self didReceiveAdView:bannerView];
   } else {
     [self.connector
           adapter:self
@@ -203,6 +217,13 @@ static BOOL _isAdPresenting;
                                  code:0
                              userInfo:@{NSLocalizedDescriptionKey : @"Error in creating adView"}]];
   }
+}
+
+- (BOOL)isBannerAd {
+    if (self.adapterAdType == MREC || self.adapterAdType == Banner || self.adapterAdType == LeaderboardBanner) {
+        return YES;
+    }
+    return NO;
 }
 
 #pragma mark - VungleRouter delegates
@@ -220,7 +241,7 @@ static BOOL _isAdPresenting;
 }
 
 - (void)adAvailable {
-  if (self.adapterAdType == MREC) {
+  if ([self isBannerAd]) {
     self.bannerState = BannerRouterDelegateStateCached;
     [self connectAdViewToViewController];
   } else if (self.adapterAdType == Interstitial) {
@@ -233,7 +254,7 @@ static BOOL _isAdPresenting;
 }
 
 - (void)willShowAd {
-  if (self.adapterAdType == MREC) {
+  if ([self isBannerAd]) {
     self.bannerState = BannerRouterDelegateStatePlaying;
   } else if (self.adapterAdType == Interstitial) {
     [self.connector adapterWillPresentInterstitial:self];
@@ -242,7 +263,7 @@ static BOOL _isAdPresenting;
 
 - (void)willCloseAd:(BOOL)completedView didDownload:(BOOL)didDownload {
   id<GADMAdNetworkConnector> strongConnector = self.connector;
-  if (self.adapterAdType == MREC) {
+  if ([self isBannerAd]) {
     self.bannerState = BannerRouterDelegateStateClosing;
     if (didDownload) {
       if (strongConnector) {
@@ -261,7 +282,7 @@ static BOOL _isAdPresenting;
 }
 
 - (void)didCloseAd:(BOOL)completedView didDownload:(BOOL)didDownload {
-  if (self.adapterAdType == MREC) {
+  if ([self isBannerAd]) {
     self.bannerState = BannerRouterDelegateStateClosed;
   } else if (self.adapterAdType == Interstitial) {
     [self.connector adapterDidDismissInterstitial:self];
