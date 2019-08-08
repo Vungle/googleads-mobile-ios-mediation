@@ -22,9 +22,9 @@ extern const CGSize kVGNBannerShortSize;
 - (void)willCloseAd:(BOOL)completedView didDownload:(BOOL)didDownload;
 - (void)didCloseAd:(BOOL)completedView didDownload:(BOOL)didDownload;
 @property(nonatomic, strong) NSString *desiredPlacement;
+@property(nonatomic, assign) VungleNetworkAdapterAdType adapterAdType;
 @optional
 - (BOOL)isBannerAd;
-@property(nonatomic, assign) VungleNetworkAdapterAdType adapterAdType;
 @property(nonatomic, assign) BannerRouterDelegateState bannerState;
 @end
 
