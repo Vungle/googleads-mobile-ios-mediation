@@ -6,6 +6,7 @@
 
 @interface GADMAdapterVungleInterstitial ()<VungleDelegate>
 @property(nonatomic, weak) id<GADMAdNetworkConnector> connector;
+@property(nonatomic, assign) CGSize bannerSize;
 @end
 
 @implementation GADMAdapterVungleInterstitial
@@ -37,23 +38,26 @@ static BOOL _isAdPresenting;
 #pragma mark - GAD Ad Network Protocol Banner Methods (MREC)
 
 - (void)getBannerWithSize:(GADAdSize)adSize {
-  // Check if given banner size is in MREC.
-  if (!CGSizeEqualToSize(adSize.size, kGADAdSizeMediumRectangle.size) && !CGSizeEqualToSize(adSize.size, kGADAdSizeBanner.size) && !CGSizeEqualToSize(adSize.size, kGADAdSizeLeaderboard.size)) {
+  // Check if given banner size is in MREC or Banner.
+  if (!CGSizeEqualToSize(adSize.size, kGADAdSizeMediumRectangle.size) && !CGSizeEqualToSize(adSize.size, kGADAdSizeBanner.size) && !CGSizeEqualToSize(adSize.size, kVGNBannerShortSize) && !CGSizeEqualToSize(adSize.size, kGADAdSizeLeaderboard.size)) {
     NSError *error = [NSError
         errorWithDomain:kGADMAdapterVungleErrorDomain
                    code:0
                userInfo:@{
-                 NSLocalizedDescriptionKey : @"Vungle only supports banner ad size in 300 x 250."
+                 NSLocalizedDescriptionKey : @"Vungle only supports banner ad size in 300 x 250, 320 x 50, 300 x 50 and 728 x 90."
                }];
     [self.connector adapter:self didFailAd:error];
     return;
   }
     
+    self.bannerSize = adSize.size;
     if (CGSizeEqualToSize(adSize.size, kGADAdSizeMediumRectangle.size)) {
         self.adapterAdType = MREC;
     } else if (CGSizeEqualToSize(adSize.size, kGADAdSizeBanner.size)) {
         self.adapterAdType = Banner;
-    } else if (!CGSizeEqualToSize(adSize.size, kGADAdSizeLeaderboard.size)) {
+    } else if (CGSizeEqualToSize(adSize.size, kVGNBannerShortSize)) {
+        self.adapterAdType = ShortBanner;
+    } else if (CGSizeEqualToSize(adSize.size, kGADAdSizeLeaderboard.size)) {
         self.adapterAdType = LeaderboardBanner;
     }
 
@@ -72,7 +76,7 @@ static BOOL _isAdPresenting;
     return;
   }
 
-  // Check if a banner (MREC) ad has been initiated with the samne PlacementID
+  // Check if a banner or MREC ad has been initiated with the samne PlacementID
   // or not. (Vungle supports only one banner currently.)
   if (![[VungleRouter sharedInstance] canRequestBannerAdForPlacementID:self.desiredPlacement withBannerType:self.adapterAdType]) {
     NSError *error =
@@ -191,17 +195,8 @@ static BOOL _isAdPresenting;
 }
 
 - (void)connectAdViewToViewController {
-  GADAdSize size;
-  if (self.adapterAdType == Banner) {
-    size = kGADAdSizeBanner;
-  } else if (self.adapterAdType == LeaderboardBanner) {
-    size = kGADAdSizeLeaderboard;
-  } else if (self.adapterAdType == MREC) {
-    size = kGADAdSizeMediumRectangle;
-  }
-    
   UIView *bannerView =
-      [[UIView alloc] initWithFrame:CGRectMake(0, 0, size.size.width, size.size.height)];
+      [[UIView alloc] initWithFrame:CGRectMake(0, 0, _bannerSize.width, _bannerSize.height)];
   bannerView = [[VungleRouter sharedInstance] renderBannerAdInView:bannerView
                                                           delegate:self
                                                             extras:[self.connector networkExtras]
@@ -220,7 +215,7 @@ static BOOL _isAdPresenting;
 }
 
 - (BOOL)isBannerAd {
-    if (self.adapterAdType == MREC || self.adapterAdType == Banner || self.adapterAdType == LeaderboardBanner) {
+    if (self.adapterAdType == MREC || self.adapterAdType == Banner || self.adapterAdType == ShortBanner || self.adapterAdType == LeaderboardBanner) {
         return YES;
     }
     return NO;

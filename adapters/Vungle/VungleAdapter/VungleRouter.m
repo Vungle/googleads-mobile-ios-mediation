@@ -2,6 +2,8 @@
 #import "GADMAdapterVungleConstants.h"
 #import "VungleRouterConsent.h"
 
+const CGSize kVGNBannerShortSize = {300, 50};
+
 @interface VungleRouter ()
 @property(strong) NSMapTable<NSString *, id<VungleDelegate>> *delegates;
 @property(strong) NSMapTable<NSString *, id<VungleDelegate>> *initializingDelegates;
@@ -68,6 +70,9 @@
   _isMrecPlaying = NO;
   _isBannerPlaying = NO;
 
+  //Disable refresh functionality for all banners
+  [[VungleSDK sharedSDK] disableBannerRefresh];
+
   NSError *err = nil;
   [sdk startWithAppId:appId error:&err];
   if (err) {
@@ -90,7 +95,7 @@
         [self.delegates setObject:delegate forKey:delegate.desiredPlacement];
       }
     }
-  } else if (delegate.adapterAdType == MREC || delegate.adapterAdType == Banner || delegate.adapterAdType == LeaderboardBanner) {
+  } else if ([delegate respondsToSelector:@selector(isBannerAd)] && [delegate isBannerAd]) {
     @synchronized(self.bannerDelegates) {
         if (delegate.adapterAdType == MREC) {
             self.mrecPlacementID = [delegate.desiredPlacement copy];
@@ -133,7 +138,7 @@
         [self.delegates removeObjectForKey:delegate.desiredPlacement];
       }
     }
-  } else if (delegate.adapterAdType == MREC) {
+  } else if ([delegate respondsToSelector:@selector(isBannerAd)] && [delegate isBannerAd]) {
     @synchronized(self.bannerDelegates) {
       if (delegate && [self.bannerDelegates objectForKey:delegate.desiredPlacement]) {
         [self.bannerDelegates removeObjectForKey:delegate.desiredPlacement];
@@ -190,14 +195,14 @@
   } else {
     NSError *loadError;
     VungleNetworkAdapterAdType adType = [delegate adapterAdType];
-    if (adType != Banner && adType != LeaderboardBanner) {
+    if (adType != Banner && adType != ShortBanner && adType != LeaderboardBanner) {
         if (![sdk loadPlacementWithID:placement error:&loadError]) {
               if (loadError) {
                   return loadError;
               }
           }
     } else {
-        if (![sdk loadPlacementWithID:placement withSize:(adType == Banner ? kGADAdSizeBanner : kGADAdSizeLeaderboard).size error:&loadError]) {
+        if (![sdk loadPlacementWithID:placement withSize:[self getVungleBannerAdSizeType:adType] error:&loadError]) {
             if (loadError) {
                 return loadError;
             }
@@ -206,6 +211,19 @@
   }
     
   return nil;
+}
+
+- (VungleAdSize)getVungleBannerAdSizeType:(VungleNetworkAdapterAdType)adType {
+    switch (adType) {
+        case Banner:
+            return VungleAdSizeBanner;
+        case ShortBanner:
+            return VungleAdSizeBannerShort;
+        case LeaderboardBanner:
+            return VungleAdSizeBannerLeaderboard;
+        default:
+            return VungleAdSizeUnknown;
+    }
 }
 
 - (BOOL)playAd:(UIViewController *)viewController
@@ -260,12 +278,20 @@
                                             placementID:placementID
                                                   error:&bannerError];
   if (success) {
-    self.isMrecPlaying = YES;
+    if (delegate.adapterAdType == MREC) {
+        self.isMrecPlaying = YES;
+    } else {
+        self.isBannerPlaying = YES;
+    }
 
     return bannerView;
   } else {
     NSLog(@"Banner loading error: %@", bannerError.localizedDescription);
-    self.isMrecPlaying = NO;
+    if (delegate.adapterAdType == MREC) {
+        self.isMrecPlaying = NO;
+    } else {
+        self.isBannerPlaying = NO;
+    }
 
     return nil;
   }
@@ -274,9 +300,14 @@
 }
 
 - (void)completeBannerAdViewForPlacementID:(NSString *)placementID {
-  if (placementID && self.isMrecPlaying) {
+  if (placementID && (self.isMrecPlaying || self.isBannerPlaying)) {
     NSLog(@"Vungle: Triggering an ad completion call for %@", placementID);
-    self.isMrecPlaying = NO;
+      
+    if (self.isMrecPlaying) {
+        self.isMrecPlaying = NO;
+    } else {
+        self.isBannerPlaying = NO;
+    }
 
     [[VungleSDK sharedSDK] finishedDisplayingAd];
   }
