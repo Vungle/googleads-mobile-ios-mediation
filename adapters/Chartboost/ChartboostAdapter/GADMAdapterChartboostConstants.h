@@ -25,3 +25,5 @@ static NSString *const kGADMAdapterChartboostAppSignature = @"appSignature";
 
 /// Chartboost Ad Location.
 static NSString *const kGADMAdapterChartboostAdLocation = @"adLocation";
+
+static NSString *const kGADMAdapterChartboostErrorDomain = @"com.google.mediation.chartboost";

@@ -5,14 +5,12 @@
 //
 
 #import <Foundation/Foundation.h>
-@import GoogleMobileAds;
+#import <GoogleMobileAds/GoogleMobileAds.h>
 
-NS_ASSUME_NONNULL_BEGIN
+NSInteger GADMAdapterInMobiAdMobErrorCodeForInMobiCode(NSInteger inMobiErrorCode);
 
-@interface GADMAdapterInMobiUtils : NSObject
+/// Adds |object| to |set| if |object| is not nil.
+void GADMAdapterInMobiMutableSetAddObject(NSMutableSet *_Nullable set, NSObject *_Nonnull object);
 
-+ (NSInteger)getAdMobErrorCode:(NSInteger)inmobiErrorCode;
-
-@end
-
-NS_ASSUME_NONNULL_END
+void GADMAdapterInMobiMutableSetSafeGADRTBSignalCompletionHandler(
+    GADRTBSignalCompletionHandler handler, GADRTBSignalCompletionHandler setHandler);

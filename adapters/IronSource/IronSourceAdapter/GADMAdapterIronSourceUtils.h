@@ -16,6 +16,9 @@
 @import GoogleMobileAds;
 #import <IronSource/IronSource.h>
 
+void GADMAdapterIronSourceMutableSetAddObject(NSMutableSet *_Nullable set,
+                                              NSObject *_Nonnull object);
+
 /// Holds Shared code for IronSource adapters.
 @interface GADMAdapterIronSourceUtils : NSObject
 
