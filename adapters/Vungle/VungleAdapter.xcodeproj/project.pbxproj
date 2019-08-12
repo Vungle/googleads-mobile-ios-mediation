@@ -34,6 +34,8 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		40000AEA23018819008C7557 /* VungleRouterConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 40000AE823018819008C7557 /* VungleRouterConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		40000AEB23018819008C7557 /* VungleRouterConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 40000AE923018819008C7557 /* VungleRouterConfiguration.m */; };
 		4552392820B6381D0081388F /* VungleRouter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4552392520B6381D0081388F /* VungleRouter.m */; };
 		4552392920B6381E0081388F /* VungleRouter.h in Headers */ = {isa = PBXBuildFile; fileRef = 4552392620B6381D0081388F /* VungleRouter.h */; };
 		4552392A20B6381E0081388F /* VungleRouterConsent.m in Sources */ = {isa = PBXBuildFile; fileRef = 4552392720B6381D0081388F /* VungleRouterConsent.m */; };
@@ -84,6 +86,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		40000AE823018819008C7557 /* VungleRouterConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VungleRouterConfiguration.h; sourceTree = "<group>"; };
+		40000AE923018819008C7557 /* VungleRouterConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VungleRouterConfiguration.m; sourceTree = "<group>"; };
 		4552392520B6381D0081388F /* VungleRouter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VungleRouter.m; sourceTree = "<group>"; };
 		4552392620B6381D0081388F /* VungleRouter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VungleRouter.h; sourceTree = "<group>"; };
 		4552392720B6381D0081388F /* VungleRouterConsent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VungleRouterConsent.m; sourceTree = "<group>"; };
@@ -128,6 +132,8 @@
 		7D15756E1EB7FB9200059469 /* VungleAdapter */ = {
 			isa = PBXGroup;
 			children = (
+				40000AE823018819008C7557 /* VungleRouterConfiguration.h */,
+				40000AE923018819008C7557 /* VungleRouterConfiguration.m */,
 				4552392620B6381D0081388F /* VungleRouter.h */,
 				4552392520B6381D0081388F /* VungleRouter.m */,
 				4552392720B6381D0081388F /* VungleRouterConsent.m */,
@@ -217,6 +223,7 @@
 				4593F48F227CE28A00F57AE5 /* GADMAdapterVungleUtils.h in Headers */,
 				A85428E01F11853A00C135E7 /* GADMAdapterVungleInterstitial.h in Headers */,
 				45BFFB5D22272D4300C96A67 /* GADMAdapterVungleRewardedAd.h in Headers */,
+				40000AEA23018819008C7557 /* VungleRouterConfiguration.h in Headers */,
 				7D1575721EB7FBB200059469 /* VungleAdapter.h in Headers */,
 				56C4F0F21F29531200BABF7E /* VungleAdNetworkExtras.h in Headers */,
 				A85428E21F11853A00C135E7 /* GADMAdapterVungleRewardBasedVideoAd.h in Headers */,
@@ -330,6 +337,7 @@
 				A85428E11F11853A00C135E7 /* GADMAdapterVungleInterstitial.m in Sources */,
 				A85428E31F11853A00C135E7 /* GADMAdapterVungleRewardBasedVideoAd.m in Sources */,
 				4552392820B6381D0081388F /* VungleRouter.m in Sources */,
+				40000AEB23018819008C7557 /* VungleRouterConfiguration.m in Sources */,
 				4593F490227CE28A00F57AE5 /* GADMAdapterVungleUtils.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
