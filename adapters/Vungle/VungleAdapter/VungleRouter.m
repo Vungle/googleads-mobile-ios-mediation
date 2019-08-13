@@ -233,7 +233,7 @@ const CGSize kVGNBannerShortSize = {300, 50};
       ![[VungleSDK sharedSDK] isAdCachedForPlacementID:delegate.desiredPlacement]) {
     return false;
   }
-  NSMutableDictionary *options = [[NSMutableDictionary alloc] init];  //
+  NSMutableDictionary *options = [[NSMutableDictionary alloc] init];
   NSError *error = nil;
   bool didAdStartPlaying = true;
   [VungleSDK sharedSDK].muted = extras.muted;
@@ -261,7 +261,7 @@ const CGSize kVGNBannerShortSize = {300, 50};
                           extras:(VungleAdNetworkExtras *)extras
                   forPlacementID:(NSString *)placementID {
   NSError *bannerError = nil;
-  NSMutableDictionary *options = [[NSMutableDictionary alloc] init];  ///
+  NSMutableDictionary *options = [[NSMutableDictionary alloc] init];
   if (extras.muted) {
     [VungleSDK sharedSDK].muted = extras.muted;
   } else {
@@ -292,8 +292,6 @@ const CGSize kVGNBannerShortSize = {300, 50};
     } else {
         self.isBannerPlaying = NO;
     }
-
-    return nil;
   }
 
   return nil;
