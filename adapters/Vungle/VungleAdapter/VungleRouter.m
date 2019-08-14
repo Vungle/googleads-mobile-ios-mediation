@@ -209,7 +209,7 @@ const CGSize kVGNBannerShortSize = {300, 50};
         }
     }
   }
-    
+
   return nil;
 }
 

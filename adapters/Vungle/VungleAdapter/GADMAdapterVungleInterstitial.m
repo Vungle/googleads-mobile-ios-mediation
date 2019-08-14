@@ -196,7 +196,7 @@ static BOOL _isAdPresenting;
 
 - (void)connectAdViewToViewController {
   UIView *bannerView =
-      [[UIView alloc] initWithFrame:CGRectMake(0, 0, _bannerSize.width, _bannerSize.height)];
+      [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.bannerSize.width, self.bannerSize.height)];
   bannerView = [[VungleRouter sharedInstance] renderBannerAdInView:bannerView
                                                           delegate:self
                                                             extras:[self.connector networkExtras]
