@@ -2,7 +2,7 @@
 #import <VungleSDK/VungleSDK.h>
 #import "VungleAdNetworkExtras.h"
 
-typedef NS_ENUM(NSUInteger, VungleNetworkAdapterAdType) { Unknown, Rewarded, Interstitial, MREC };
+typedef NS_ENUM(NSUInteger, VungleNetworkAdapterAdType) { Unknown, Rewarded, Interstitial, MREC, Banner, ShortBanner, LeaderboardBanner };
 
 typedef NS_ENUM(NSUInteger, BannerRouterDelegateState) {
   BannerRouterDelegateStateRequesting,
@@ -11,6 +11,8 @@ typedef NS_ENUM(NSUInteger, BannerRouterDelegateState) {
   BannerRouterDelegateStateClosing,
   BannerRouterDelegateStateClosed
 };
+
+extern const CGSize kVGNBannerShortSize;
 
 @protocol VungleDelegate<NSObject>
 - (void)initialized:(BOOL)isSuccess error:(NSError *)error;
@@ -22,6 +24,7 @@ typedef NS_ENUM(NSUInteger, BannerRouterDelegateState) {
 @property(nonatomic, strong) NSString *desiredPlacement;
 @property(nonatomic, assign) VungleNetworkAdapterAdType adapterAdType;
 @optional
+- (BOOL)isBannerAd;
 @property(nonatomic, assign) BannerRouterDelegateState bannerState;
 @end
 
@@ -42,5 +45,5 @@ typedef NS_ENUM(NSUInteger, BannerRouterDelegateState) {
                           extras:(VungleAdNetworkExtras *)extras
                   forPlacementID:(NSString *)placementID;
 - (void)completeBannerAdViewForPlacementID:(NSString *)placementID;
-- (BOOL)canRequestBannerAdForPlacementID:(NSString *)placmentID;
+- (BOOL)canRequestBannerAdForPlacementID:(NSString *)placmentID withBannerType:(VungleNetworkAdapterAdType)bannerType;
 @end
