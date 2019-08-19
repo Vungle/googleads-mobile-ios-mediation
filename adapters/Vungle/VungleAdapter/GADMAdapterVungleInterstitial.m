@@ -84,7 +84,7 @@ static BOOL _isAdPresenting;
                             code:0
                         userInfo:@{
                           NSLocalizedDescriptionKey : @"A banner ad type has been already "
-                                                      @"instanciated. Multiple banner ads are not "
+                                                      @"instantiated. Multiple banner ads are not "
                                                       @"supported with Vungle iOS SDK."
                         }];
     [self.connector adapter:self didFailAd:error];
