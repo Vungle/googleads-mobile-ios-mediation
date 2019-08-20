@@ -2,7 +2,15 @@
 #import <VungleSDK/VungleSDK.h>
 #import "VungleAdNetworkExtras.h"
 
-typedef NS_ENUM(NSUInteger, VungleNetworkAdapterAdType) { Unknown, Rewarded, Interstitial, MREC, Banner, ShortBanner, LeaderboardBanner };
+typedef NS_ENUM(NSUInteger, VungleNetworkAdapterAdType) {
+    Unknown,
+    Rewarded,
+    Interstitial,
+    MREC,
+    Banner,
+    ShortBanner,
+    LeaderboardBanner
+};
 
 typedef NS_ENUM(NSUInteger, BannerRouterDelegateState) {
   BannerRouterDelegateStateRequesting,

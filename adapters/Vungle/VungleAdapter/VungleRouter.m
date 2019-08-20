@@ -170,7 +170,7 @@ const CGSize kVGNBannerShortSize = {300, 50};
 }
 
 - (BOOL)canRequestBannerAdForPlacementID:(NSString *)placmentID withBannerType:(VungleNetworkAdapterAdType)bannerType{
-    NSString *placement = (bannerType == MREC ? _mrecPlacementID : _bannerPlacementID);
+    NSString *placement = (bannerType == MREC ? self.mrecPlacementID : self.bannerPlacementID);
     return placement == nil || [placement isEqualToString:placmentID];
 }
 
@@ -301,13 +301,14 @@ const CGSize kVGNBannerShortSize = {300, 50};
   if (placementID && (self.isMrecPlaying || self.isBannerPlaying)) {
     NSLog(@"Vungle: Triggering an ad completion call for %@", placementID);
       
+    [[VungleSDK sharedSDK] finishedDisplayingAd];
     if (self.isMrecPlaying) {
         self.isMrecPlaying = NO;
+        self.mrecPlacementID = nil;
     } else {
         self.isBannerPlaying = NO;
+        self.bannerPlacementID = nil;
     }
-
-    [[VungleSDK sharedSDK] finishedDisplayingAd];
   }
 }
 
