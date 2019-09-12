@@ -53,5 +53,5 @@ extern const CGSize kVGNBannerShortSize;
                           extras:(VungleAdNetworkExtras *)extras
                   forPlacementID:(NSString *)placementID;
 - (void)completeBannerAdViewForPlacementID:(NSString *)placementID;
-- (BOOL)canRequestBannerAdForPlacementID:(NSString *)placmentID withBannerType:(VungleNetworkAdapterAdType)bannerType;
+- (BOOL)canRequestBannerAdForPlacementID:(NSString *)placmentID;
 @end

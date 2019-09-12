@@ -78,7 +78,7 @@ static BOOL _isAdPresenting;
 
   // Check if a banner or MREC ad has been initiated with the samne PlacementID
   // or not. (Vungle supports only one banner currently.)
-  if (![[VungleRouter sharedInstance] canRequestBannerAdForPlacementID:self.desiredPlacement withBannerType:self.adapterAdType]) {
+  if (![[VungleRouter sharedInstance] canRequestBannerAdForPlacementID:self.desiredPlacement]) {
     NSError *error =
         [NSError errorWithDomain:@"google"
                             code:0
