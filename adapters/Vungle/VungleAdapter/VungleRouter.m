@@ -270,11 +270,9 @@ const CGSize kVGNBannerShortSize = {300, 50};
                                             placementID:placementID
                                                   error:&bannerError];
   if (success) {
-    self.isBannerPlaying = YES;
     return bannerView;
   } else {
     NSLog(@"Banner loading error: %@", bannerError.localizedDescription);
-    self.isBannerPlaying = NO;
   }
 
   return nil;
@@ -308,6 +306,12 @@ const CGSize kVGNBannerShortSize = {300, 50};
   if (delegate) {
     [delegate willShowAd];
   }
+}
+
+- (void)vungleDidShowAdForPlacementID:(nullable NSString *)placementID {
+    if ([placementID isEqualToString:self.mrecPlacementID]) {
+        self.isMrecPlaying = YES;
+    }
 }
 
 - (void)vungleWillCloseAdWithViewInfo:(nonnull VungleViewInfo *)info
