@@ -163,7 +163,11 @@ const CGSize kVGNBannerShortSize = {300, 50};
 }
 
 - (BOOL)canRequestBannerAdForPlacementID:(NSString *)placmentID {
-    return self.bannerPlacementID == nil || [self.bannerPlacementID isEqualToString:placmentID];
+    if (self.bannerDelegates.count > 0) {
+        return self.bannerPlacementID == nil || [self.bannerPlacementID isEqualToString:placmentID];
+    }
+    
+    return YES;
 }
 
 - (NSError *)loadAd:(NSString *)placement withDelegate:(id<VungleDelegate>)delegate {
