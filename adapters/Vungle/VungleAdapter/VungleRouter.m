@@ -64,7 +64,7 @@ const CGSize kVGNBannerShortSize = {300, 50};
     return;
   }
 
-  _isInitialising = true;
+  _isInitialising = NO;
   _isBannerPlaying = NO;
 
   //Disable refresh functionality for all banners
