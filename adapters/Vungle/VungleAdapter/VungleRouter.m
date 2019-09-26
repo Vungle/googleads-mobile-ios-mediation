@@ -2,7 +2,7 @@
 #import "GADMAdapterVungleConstants.h"
 #import "VungleRouterConsent.h"
 
-const CGSize kVGNBannerShortSize = {300, 50};
+const CGSize kVNGBannerShortSize = {300, 50};
 
 @interface VungleRouter ()
 @property(strong) NSMapTable<NSString *, id<VungleDelegate>> *delegates;

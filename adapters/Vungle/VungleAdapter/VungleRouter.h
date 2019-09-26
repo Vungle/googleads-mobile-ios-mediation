@@ -20,7 +20,7 @@ typedef NS_ENUM(NSUInteger, BannerRouterDelegateState) {
   BannerRouterDelegateStateClosed
 };
 
-extern const CGSize kVGNBannerShortSize;
+extern const CGSize kVNGBannerShortSize;
 
 @protocol VungleDelegate<NSObject>
 - (void)initialized:(BOOL)isSuccess error:(NSError *)error;
