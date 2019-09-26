@@ -40,8 +40,11 @@ static BOOL _isAdPresenting;
 #pragma mark - GAD Ad Network Protocol Banner Methods (MREC)
 
 - (void)getBannerWithSize:(GADAdSize)adSize {
+  // An array of supported ad sizes.
+  NSArray *potentials = @[NSValueFromGADAdSize(kGADAdSizeMediumRectangle), NSValueFromGADAdSize(kGADAdSizeBanner), NSValueFromGADAdSize(kGADAdSizeLeaderboard)];
+  GADAdSize closestSize = GADClosestValidSizeForAdSizes(adSize, potentials);
   // Check if given banner size is in MREC or Banner.
-  if (!CGSizeEqualToSize(adSize.size, kGADAdSizeMediumRectangle.size) && !CGSizeEqualToSize(adSize.size, kGADAdSizeBanner.size) && !CGSizeEqualToSize(adSize.size, kVGNBannerShortSize) && !CGSizeEqualToSize(adSize.size, kGADAdSizeLeaderboard.size)) {
+  if (!IsGADAdSizeValid(closestSize)) {
     NSError *error = [NSError
         errorWithDomain:kGADMAdapterVungleErrorDomain
                    code:0

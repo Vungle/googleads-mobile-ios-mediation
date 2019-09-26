@@ -64,7 +64,7 @@ const CGSize kVGNBannerShortSize = {300, 50};
     return;
   }
 
-  _isInitialising = NO;
+  _isInitialising = YES;
   _isBannerPlaying = NO;
 
   //Disable refresh functionality for all banners
@@ -142,7 +142,6 @@ const CGSize kVGNBannerShortSize = {300, 50};
 
 - (BOOL)hasDelegateForPlacementID:(NSString *)placementID
                       adapterType:(VungleNetworkAdapterAdType)adapterType {
-  BOOL result = NO;
   NSMapTable<NSString *, id<VungleDelegate>> *delegates;
   if ([self isSDKInitialized]) {
     delegates = [self.delegates copy];
@@ -154,12 +153,11 @@ const CGSize kVGNBannerShortSize = {300, 50};
     id<VungleDelegate> delegate = [delegates objectForKey:key];
     if (delegate.adapterAdType == adapterType &&
         [delegate.desiredPlacement isEqualToString:placementID]) {
-      result = YES;
-      break;
+      return YES;
     }
   }
 
-  return result;
+  return NO;
 }
 
 - (BOOL)canRequestBannerAdForPlacementID:(NSString *)placmentID {
@@ -313,8 +311,8 @@ const CGSize kVGNBannerShortSize = {300, 50};
 }
 
 - (void)vungleDidShowAdForPlacementID:(nullable NSString *)placementID {
-    if ([placementID isEqualToString:self.mrecPlacementID]) {
-        self.isMrecPlaying = YES;
+    if ([placementID isEqualToString:self.bannerPlacementID]) {
+        self.isBannerPlaying = YES;
     }
 }
 
@@ -329,8 +327,8 @@ const CGSize kVGNBannerShortSize = {300, 50};
 - (void)vungleDidCloseAdWithViewInfo:(VungleViewInfo *)info placementID:(NSString *)placementID {
   id<VungleDelegate> delegate = [self getDelegateForPlacement:placementID];
   if (delegate) {
-    [self removeDelegate:delegate];
     [delegate didCloseAd:[info.completedView boolValue] didDownload:[info.didDownload boolValue]];
+    [self removeDelegate:delegate];
   }
 }
 
@@ -345,8 +343,8 @@ const CGSize kVGNBannerShortSize = {300, 50};
     [delegate adAvailable];
   } else if (error) {
     NSLog(@"Vungle Ad Playability returned an error: %@", error.localizedDescription);
-    [self removeDelegate:delegate];
     [delegate adNotAvailable:error];
+    [self removeDelegate:delegate];
   }
 }
 
