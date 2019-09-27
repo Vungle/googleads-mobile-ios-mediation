@@ -15,6 +15,10 @@
 // To check if the ad is presenting so that we don't call 'adLoadCompletionHandler' twice.
 static BOOL _isRewardedAdPresenting;
 
++ (NSString *)adapterVersion {
+    return kGADMAdapterVungleVersion;
+}
+
 - (instancetype)initWithAdConfiguration:(GADMediationRewardedAdConfiguration *)adConfiguration
                       completionHandler:(GADMediationRewardedLoadCompletionHandler)handler {
   self = [super init];
