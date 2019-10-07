@@ -272,9 +272,11 @@ const CGSize kVNGBannerShortSize = {300, 50};
                                             placementID:placementID
                                                   error:&bannerError];
   if (success) {
+    self.isBannerPlaying = YES;
     return bannerView;
   } else {
     NSLog(@"Banner loading error: %@", bannerError.localizedDescription);
+    self.isBannerPlaying = NO;
   }
 
   return nil;
