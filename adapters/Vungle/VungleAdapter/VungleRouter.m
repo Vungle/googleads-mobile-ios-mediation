@@ -236,6 +236,17 @@ const CGSize kVNGBannerShortSize = {300, 50};
   if (extras.flexViewAutoDismissSeconds)
     [options setObject:@(extras.flexViewAutoDismissSeconds)
                 forKey:VunglePlayAdOptionKeyFlexViewAutoDismissSeconds];
+  if (extras.orientations) {
+    int appOrientation = [extras.orientations intValue];
+    NSNumber *orientations = @(UIInterfaceOrientationMaskAll);
+    if (appOrientation == 1) {
+          orientations = @(UIInterfaceOrientationMaskLandscape);
+    } else if (appOrientation == 2) {
+          orientations = @(UIInterfaceOrientationMaskPortrait);
+    }
+    options[VunglePlayAdOptionKeyOrientations] = orientations;
+  }
+
   if (![[VungleSDK sharedSDK] playAd:viewController
                              options:options
                          placementID:delegate.desiredPlacement
