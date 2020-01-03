@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2019 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,9 @@
 // limitations under the License.
 
 #import "GADMediationAdapterTapjoy.h"
+
 #import <Tapjoy/Tapjoy.h>
+
 #import "GADMAdapterTapjoy.h"
 #import "GADMAdapterTapjoyConstants.h"
 #import "GADMAdapterTapjoySingleton.h"
@@ -22,17 +24,16 @@
 #import "GADMRewardedAdTapjoy.h"
 #import "GADMTapjoyExtras.h"
 
-@interface GADMediationAdapterTapjoy ()
+@implementation GADMediationAdapterTapjoy {
+  /// Tapjoy interstitial ad wrapper.
+  GADMRTBInterstitialRendererTapjoy *_interstitialRenderer;
 
-@property(nonatomic, strong) GADMRTBInterstitialRendererTapjoy *interstitialRenderer;
-@property(nonatomic, strong) GADMRewardedAdTapjoy *rewardedAd;
+  /// Tapjoy rewarded ad wrapper.
+  GADMRewardedAdTapjoy *_rewardedAd;
+}
 
-@end
-
-@implementation GADMediationAdapterTapjoy
-
-+ (void)setUpWithConfiguration:(GADMediationServerConfiguration *)configuration
-             completionHandler:(GADMediationAdapterSetUpCompletionBlock)completionHandler {
++ (void)setUpWithConfiguration:(nonnull GADMediationServerConfiguration *)configuration
+             completionHandler:(nonnull GADMediationAdapterSetUpCompletionBlock)completionHandler {
   // Pass additional info through to SDK for upcoming request, etc.
   NSMutableSet *sdkKeys = [[NSMutableSet alloc] init];
 
@@ -99,26 +100,27 @@
   return version;
 }
 
-- (void)collectSignalsForRequestParameters:(GADRTBRequestParameters *)params
-                         completionHandler:(GADRTBSignalCompletionHandler)completionHandler {
+- (void)collectSignalsForRequestParameters:(nonnull GADRTBRequestParameters *)params
+                         completionHandler:
+                             (nonnull GADRTBSignalCompletionHandler)completionHandler {
   NSString *signals = [Tapjoy getUserToken];
   completionHandler(signals, nil);
 }
 
 - (void)loadInterstitialForAdConfiguration:
-            (GADMediationInterstitialAdConfiguration *)adConfiguration
-                         completionHandler:
-                             (GADMediationInterstitialLoadCompletionHandler)completionHandler {
+            (nonnull GADMediationInterstitialAdConfiguration *)adConfiguration
+                         completionHandler:(nonnull GADMediationInterstitialLoadCompletionHandler)
+                                               completionHandler {
   _interstitialRenderer = [[GADMRTBInterstitialRendererTapjoy alloc] init];
   [_interstitialRenderer renderInterstitialForAdConfig:adConfiguration
                                      completionHandler:completionHandler];
 }
 
-- (void)loadRewardedAdForAdConfiguration:(GADMediationRewardedAdConfiguration *)adConfiguration
+- (void)loadRewardedAdForAdConfiguration:
+            (nonnull GADMediationRewardedAdConfiguration *)adConfiguration
                        completionHandler:
-                           (GADMediationRewardedLoadCompletionHandler)completionHandler {
+                           (nonnull GADMediationRewardedLoadCompletionHandler)completionHandler {
   _rewardedAd = [[GADMRewardedAdTapjoy alloc] init];
-
   [_rewardedAd loadRewardedAdForAdConfiguration:adConfiguration
                               completionHandler:completionHandler];
 }

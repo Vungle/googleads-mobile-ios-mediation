@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019 Google LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,13 +13,13 @@
 // limitations under the License.
 
 #import <Foundation/Foundation.h>
-#import <GoogleMobileAds/GoogleMobileAds.h>
+#import "GADMVerizonPrivacy.h"
 
-@interface GADMRTBInterstitialRendererTapjoy : NSObject
+@interface GADMVerizonPrivacy (Internal)
 
-/// Asks the receiver to render the ad configuration.
-- (void)renderInterstitialForAdConfig:(nonnull GADMediationInterstitialAdConfiguration *)adConfig
-                    completionHandler:
-                        (nonnull GADMediationInterstitialLoadCompletionHandler)handler;
+/**
+ * Updates the privacy data to be forwarded to the Verizon Ads SDK.
+ */
+- (void)updatePrivacyData;
 
 @end

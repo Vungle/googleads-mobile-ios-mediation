@@ -14,8 +14,31 @@
 
 #import "GADMAdapterVerizonUtils.h"
 
+#import <VerizonAdsCore/VASAds+Private.h>
+#import <VerizonAdsCore/VASPEXRegistry.h>
+#import <VerizonAdsStandardEdition/VerizonAdsStandardEdition.h>
+#import <VerizonAdsURIExperience/VerizonAdsURIExperience.h>
+
+#import "GADMAdapterVerizonConstants.h"
+#import "GADMVerizonPrivacy_Internal.h"
+
 void GADMAdapterVerizonMutableSetAddObject(NSMutableSet *_Nullable set, NSObject *_Nonnull object) {
   if (object) {
     [set addObject:object];  // Allow pattern.
   }
+}
+
+BOOL GADMAdapterVerizonInitializeVASAdsWithSiteID(NSString *_Nullable siteID) {
+  if (![VASAds.sharedInstance isInitialized]) {
+    if (!siteID.length) {
+      siteID = [NSBundle.mainBundle objectForInfoDictionaryKey:kGADMAdapterVerizonMediaSiteID];
+    }
+    BOOL isInitialized = [VASStandardEdition initializeWithSiteId:siteID];
+    
+    [GADMVerizonPrivacy.sharedInstance updatePrivacyData];
+    VASAds.logLevel = VASLogLevelError;
+      
+    return isInitialized;
+  }
+  return YES;
 }

@@ -18,7 +18,7 @@
 #import "GADMAdapterVungleRouter.h"
 #import "GADMAdapterVungleUtils.h"
 
-@interface GADMAdapterVungleRewardedAd () <VungleDelegate>
+@interface GADMAdapterVungleRewardedAd () <GADMAdapterVungleDelegate>
 @end
 
 @implementation GADMAdapterVungleRewardedAd {
@@ -70,27 +70,19 @@
       [GADMAdapterVungleUtils findPlacement:_adConfiguration.credentials.settings
                               networkExtras:_adConfiguration.extras];
   if (!self.desiredPlacement) {
-    NSError *error =
-        [NSError errorWithDomain:kGADMAdapterVungleErrorDomain
-                            code:0
-                        userInfo:@{NSLocalizedDescriptionKey : @"'placementID' not specified"}];
+    NSError *error = GADMAdapterVungleErrorWithCodeAndDescription(kGADErrorMediationDataError,
+                                                                  @"Placement ID not specified.");
     _adLoadCompletionHandler(nil, error);
-    _adLoadCompletionHandler = nil;
     return;
   }
 
   if ([[GADMAdapterVungleRouter sharedInstance]
           hasDelegateForPlacementID:self.desiredPlacement
                         adapterType:GADMAdapterVungleAdTypeRewarded]) {
-    NSError *error = [NSError
-        errorWithDomain:@"GADMAdapterVungleRewardedAd"
-                   code:0
-               userInfo:@{
-                 NSLocalizedDescriptionKey : @"Vungle SDK does not support multiple concurrent ads "
-                                             @"load for RewardedAd ad type."
-               }];
+    NSError *error = GADMAdapterVungleErrorWithCodeAndDescription(
+        kGADErrorMediationAdapterError,
+        @"Only a maximum of one ad per placement can be requested from Vungle.");
     _adLoadCompletionHandler(nil, error);
-    _adLoadCompletionHandler = nil;
     return;
   }
 
@@ -101,10 +93,8 @@
     if (appID) {
       [[GADMAdapterVungleRouter sharedInstance] initWithAppId:appID delegate:self];
     } else {
-      NSError *error = [NSError
-          errorWithDomain:kGADMAdapterVungleErrorDomain
-                     code:0
-                 userInfo:@{NSLocalizedDescriptionKey : @"Vungle app ID should be specified!"}];
+      NSError *error = GADMAdapterVungleErrorWithCodeAndDescription(
+          kGADErrorMediationDataError, @"Vungle app ID should be specified.");
       _adLoadCompletionHandler(nil, error);
     }
   } else {
@@ -125,12 +115,9 @@
   if (![[GADMAdapterVungleRouter sharedInstance] playAd:viewController
                                                delegate:self
                                                  extras:[_adConfiguration extras]]) {
-    NSError *error = [NSError
-        errorWithDomain:kGADMAdapterVungleErrorDomain
-                   code:0
-               userInfo:@{NSLocalizedDescriptionKey : @"Adapter failed to present rewarded ad"}];
+    NSError *error = GADMAdapterVungleErrorWithCodeAndDescription(
+        kGADErrorMediationAdapterError, @"Adapter failed to present rewarded ad.");
     _adLoadCompletionHandler(nil, error);
-    _adLoadCompletionHandler = nil;
   }
 }
 
@@ -149,7 +136,6 @@
     [self loadRewardedAd];
   } else {
     _adLoadCompletionHandler(nil, error);
-    _adLoadCompletionHandler = nil;
   }
 }
 
@@ -157,7 +143,6 @@
   if (!_isRewardedAdPresenting) {
     if (_adLoadCompletionHandler) {
       _delegate = _adLoadCompletionHandler(self, nil);
-      _adLoadCompletionHandler = nil;
     }
 
     if (!_delegate) {
@@ -199,7 +184,6 @@
 
 - (void)adNotAvailable:(nonnull NSError *)error {
   _adLoadCompletionHandler(nil, error);
-  _adLoadCompletionHandler = nil;
   [[GADMAdapterVungleRouter sharedInstance] removeDelegate:self];
 }
 
