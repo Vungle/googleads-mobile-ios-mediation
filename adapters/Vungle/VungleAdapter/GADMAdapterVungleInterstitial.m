@@ -277,11 +277,8 @@
   }
 }
 
-- (void)willCloseAd:(BOOL)completedView didDownload:(BOOL)didDownload {
+- (void)willCloseAd {
   id<GADMAdNetworkConnector> strongConnector = _connector;
-  if (didDownload) {
-    [strongConnector adapterDidGetAdClick:self];
-  }
   if ([self isBannerAd]) {
     self.bannerState = BannerRouterDelegateStateClosing;
   }
@@ -292,7 +289,7 @@
   }
 }
 
-- (void)didCloseAd:(BOOL)completedView didDownload:(BOOL)didDownload {
+- (void)didCloseAd {
   if ([self isBannerAd]) {
     self.bannerState = BannerRouterDelegateStateClosed;
   }
@@ -300,6 +297,16 @@
   if (self.adapterAdType == GADMAdapterVungleAdTypeInterstitial) {
     [_connector adapterDidDismissInterstitial:self];
   }
+}
+
+- (void)trackClick {
+  id<GADMAdNetworkConnector> strongConnector = _connector;
+  [strongConnector adapterDidGetAdClick:self];
+}
+
+- (void)willLeaveApplication {
+  id<GADMAdNetworkConnector> strongConnector = _connector;
+  [strongConnector adapterWillLeaveApplication:self];
 }
 
 @end

@@ -153,25 +153,15 @@
   }
 }
 
-- (void)didCloseAd:(BOOL)completedView didDownload:(BOOL)didDownload {
+- (void)didCloseAd {
   id<GADMediationRewardedAdEventDelegate> strongDelegate = _delegate;
-  if (completedView) {
-    [strongDelegate didEndVideo];
-    GADAdReward *reward =
-        [[GADAdReward alloc] initWithRewardType:@"vungle"
-                                   rewardAmount:[NSDecimalNumber decimalNumberWithString:@"1"]];
-    [strongDelegate didRewardUserWithReward:reward];
-  }
-  if (didDownload) {
-    [strongDelegate reportClick];
-  }
   [strongDelegate didDismissFullScreenView];
 
   GADMAdapterVungleRewardedAd __weak *weakSelf = self;
   [[GADMAdapterVungleRouter sharedInstance] removeDelegate:weakSelf];
 }
 
-- (void)willCloseAd:(BOOL)completedView didDownload:(BOOL)didDownload {
+- (void)willCloseAd {
   _isRewardedAdPresenting = NO;
   [_delegate willDismissFullScreenView];
 }
@@ -186,6 +176,20 @@
 - (void)adNotAvailable:(nonnull NSError *)error {
   _adLoadCompletionHandler(nil, error);
   [[GADMAdapterVungleRouter sharedInstance] removeDelegate:self];
+}
+
+- (void)trackClick {
+  id<GADMediationRewardedAdEventDelegate> strongDelegate = _delegate;
+  [strongDelegate reportClick];
+}
+
+- (void)rewardUser {
+  id<GADMediationRewardedAdEventDelegate> strongDelegate = _delegate;
+  [strongDelegate didEndVideo];
+  GADAdReward *reward =
+  [[GADAdReward alloc] initWithRewardType:@"vungle"
+                             rewardAmount:[NSDecimalNumber decimalNumberWithString:@"1"]];
+  [strongDelegate didRewardUserWithReward:reward];
 }
 
 @end
