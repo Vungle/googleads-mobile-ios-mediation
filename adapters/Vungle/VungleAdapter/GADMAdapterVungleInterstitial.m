@@ -179,9 +179,11 @@
 
     [[GADMAdapterVungleRouter sharedInstance]
         completeBannerAdViewForPlacementID:self];
+    [[GADMAdapterVungleRouter sharedInstance] removeBannerDelegate:self];
+  } else {
+    [[GADMAdapterVungleRouter sharedInstance] removeDelegate:self];
   }
   _connector = nil;
-  [[GADMAdapterVungleRouter sharedInstance] removeBannerDelegate:self];
 }
 
 - (BOOL)isBannerAnimationOK:(GADMBannerAnimationType)animType {
