@@ -118,6 +118,10 @@ const CGSize kVNGBannerShortSize = {300, 50};
 }
 
 - (BOOL)addDelegate:(nonnull id<GADMAdapterVungleDelegate>)delegate {
+  if (!delegate) {
+    return NO;
+  }
+
   if (delegate.adapterAdType == GADMAdapterVungleAdTypeInterstitial ||
       delegate.adapterAdType == GADMAdapterVungleAdTypeRewarded) {
     @synchronized(_delegates) {
@@ -137,16 +141,14 @@ const CGSize kVNGBannerShortSize = {300, 50};
         }
 
         NSMutableOrderedSet *set = [[NSMutableOrderedSet alloc] initWithObject:delegate];
-        GADMAdapterVungleMapTableSetObjectForKey(_bannerDelegates, delegate.bannerRequest,
-                                                 set);
+        GADMAdapterVungleMapTableSetObjectForKey(_bannerDelegates, delegate.bannerRequest, set);
         _bannerPlacementID = [delegate.desiredPlacement copy];
       } else if (delegate && [_bannerDelegates objectForKey:delegate.bannerRequest]) {
         NSMutableOrderedSet *set = [[_bannerDelegates objectForKey:delegate.bannerRequest] mutableCopy];
         if (![set containsObject:delegate]) {
           GADMAdapterVungleMapTableRemoveObjectForKey(_bannerDelegates, delegate.bannerRequest);
           [set addObject:delegate];
-          GADMAdapterVungleMapTableSetObjectForKey(_bannerDelegates, delegate.bannerRequest,
-          set);
+          GADMAdapterVungleMapTableSetObjectForKey(_bannerDelegates, delegate.bannerRequest, set);
           _bannerPlacementID = [delegate.desiredPlacement copy];
         }
       }
@@ -250,10 +252,16 @@ const CGSize kVNGBannerShortSize = {300, 50};
   }
   BOOL addSuccessed = [self addDelegate:delegate];
   if (!addSuccessed) {
-    NSError *error = GADMAdapterVungleErrorWithCodeAndDescription(
-                                                                  kGADErrorMediationAdapterError, @"A banner ad type has already been "
-                                                                  @"instantiated. Multiple banner ads are not "
-                                                                  @"supported with Vungle iOS SDK.");
+    NSError *error = nil;
+    if (delegate) {
+      error = GADMAdapterVungleErrorWithCodeAndDescription(
+                                                           kGADErrorMediationAdapterError, @"A banner ad type has already been "
+                                                           @"instantiated. Multiple banner ads are not "
+                                                           @"supported with Vungle iOS SDK.");
+    } else {
+      error = GADMAdapterVungleErrorWithCodeAndDescription(
+                                                           kGADErrorMediationAdapterError, @"Can't load ad when try to add a nil delegate.");
+    }
     return error;
   }
 
