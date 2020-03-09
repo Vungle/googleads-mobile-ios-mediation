@@ -131,12 +131,24 @@ const CGSize kVNGBannerShortSize = {300, 50};
     }
   } else if ([delegate respondsToSelector:@selector(isBannerAd)] && [delegate isBannerAd]) {
     @synchronized(_bannerDelegates) {
+      // We only support displaying one Vungle Banner Ad at the same time currently
+      if (_bannerPlacementID != nil && ![_bannerPlacementID isEqualToString:delegate.desiredPlacement]) {
+        return NO;
+      }
+
       if (delegate && ![_bannerDelegates objectForKey:delegate.bannerRequest]) {
         NSEnumerator *enumerator = _bannerDelegates.keyEnumerator;
         GADMAdapterVungleBannerRequest *bannerRequest = nil;
         while (bannerRequest = [enumerator nextObject]) {
           if ([bannerRequest.placementID isEqualToString:delegate.bannerRequest.placementID]) {
             return NO;
+          } else {
+            NSOrderedSet *set = [_bannerDelegates objectForKey:bannerRequest];
+            for(id<GADMAdapterVungleDelegate>delegate in set) {
+              if (delegate.bannerState == BannerRouterDelegateStatePlaying) {
+                return NO;
+              }
+            }
           }
         }
 
