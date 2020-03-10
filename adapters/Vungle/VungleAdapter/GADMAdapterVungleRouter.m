@@ -144,8 +144,8 @@ const CGSize kVNGBannerShortSize = {300, 50};
             return NO;
           } else {
             NSOrderedSet *set = [_bannerDelegates objectForKey:bannerRequest];
-            for(id<GADMAdapterVungleDelegate>delegate in set) {
-              if (delegate.bannerState == BannerRouterDelegateStatePlaying) {
+            for(id<GADMAdapterVungleDelegate> delegate in set) {
+              if (delegate.bannerState == BannerRouterDelegateStateWillPlaying || delegate.bannerState == BannerRouterDelegateStatePlaying) {
                 return NO;
               }
             }
@@ -170,6 +170,10 @@ const CGSize kVNGBannerShortSize = {300, 50};
 }
 
 - (nullable id<GADMAdapterVungleDelegate>)getDelegateForPlacement:(nonnull NSString *)placement {
+  return [self getDelegateForPlacement:placement withBannerRouterDelegateState:BannerRouterDelegateStateRequesting];
+}
+
+- (nullable id<GADMAdapterVungleDelegate>)getDelegateForPlacement:(nonnull NSString *)placement withBannerRouterDelegateState:(BannerRouterDelegateState)bannerState {
   id<GADMAdapterVungleDelegate> delegate = nil;
   if ([placement isEqualToString:_bannerPlacementID]) {
     @synchronized(_bannerDelegates) {
@@ -177,12 +181,13 @@ const CGSize kVNGBannerShortSize = {300, 50};
       GADMAdapterVungleBannerRequest *bannerRequest = nil;
       while (bannerRequest = [enumerator nextObject]) {
         if ([bannerRequest.placementID isEqualToString:placement]) {
-          delegate = [[_bannerDelegates objectForKey:bannerRequest] objectAtIndex:0];
-          break;
+          NSOrderedSet *set = [_bannerDelegates objectForKey:bannerRequest];
+          for(id<GADMAdapterVungleDelegate> bannerDelegate in set) {
+            if (bannerDelegate.bannerState == bannerState) {
+              return bannerDelegate;
+            }
+          }
         }
-      }
-      if (delegate != nil && delegate.bannerState != BannerRouterDelegateStateRequesting) {
-        delegate = nil;
       }
     }
   } else {
@@ -204,15 +209,11 @@ const CGSize kVNGBannerShortSize = {300, 50};
         GADMAdapterVungleMapTableRemoveObjectForKey(_delegates, delegate.desiredPlacement);
       }
     }
-  }
-}
-
-- (void)removeBannerDelegate:(nonnull id<GADMAdapterVungleDelegate>)delegate {
-  if ([delegate respondsToSelector:@selector(isBannerAd)] && [delegate isBannerAd]) {
+  } else if ([delegate respondsToSelector:@selector(isBannerAd)] && [delegate isBannerAd]) {
     @synchronized(_bannerDelegates) {
       if (delegate && [_bannerDelegates objectForKey:delegate.bannerRequest]) {
         NSMutableOrderedSet *set = [[_bannerDelegates objectForKey:delegate.bannerRequest] mutableCopy];
-        if ([set containsObject:delegate]) {
+        if ([set containsObject:delegate] && (delegate.bannerState != BannerRouterDelegateStatePlaying) && (delegate.bannerState != BannerRouterDelegateStateClosing)) {
           GADMAdapterVungleMapTableRemoveObjectForKey(_bannerDelegates, delegate.bannerRequest);
           [set removeObject:delegate];
           if ([set count] > 0) {
@@ -417,7 +418,7 @@ const CGSize kVNGBannerShortSize = {300, 50};
       return;
     }
 
-    if (_isBannerPresenting || (delegate.bannerState == BannerRouterDelegateStatePlaying)) {
+    if ((_isBannerPresenting && delegate.bannerState == BannerRouterDelegateStatePlaying) || delegate.bannerState == BannerRouterDelegateStateWillPlaying) {
       NSLog(@"Vungle: Triggering an ad completion call for %@", delegate.desiredPlacement);
 
       [[VungleSDK sharedSDK] finishedDisplayingAd];
@@ -443,7 +444,14 @@ const CGSize kVNGBannerShortSize = {300, 50};
   if (!placementID.length) {
     return;
   }
-  id<GADMAdapterVungleDelegate> delegate = [self getDelegateForPlacement:placementID];
+
+  id<GADMAdapterVungleDelegate> delegate = [self getDelegateForPlacement:placementID withBannerRouterDelegateState:BannerRouterDelegateStateWillPlaying];
+  // The delegate is not Interstitial or Rewarded Video Ad
+  if (!delegate && ! _bannerPlacementID) {
+    _bannerPlacementID = placementID;
+    delegate = [self getDelegateForPlacement:placementID withBannerRouterDelegateState:BannerRouterDelegateStateWillPlaying];
+  }
+
   [delegate willShowAd];
 }
 
@@ -451,7 +459,7 @@ const CGSize kVNGBannerShortSize = {300, 50};
   if ([placementID isEqualToString:_bannerPlacementID] || !_bannerPlacementID) {
     _isBannerPresenting = YES;
     if (!_bannerPlacementID) {
-      id<GADMAdapterVungleDelegate> delegate = [self getDelegateForPlacement:placementID];
+      id<GADMAdapterVungleDelegate> delegate = [self getDelegateForPlacement:placementID withBannerRouterDelegateState:BannerRouterDelegateStatePlaying];
       // The delegate is not Interstitial or Rewarded Video Ad
       if (!delegate) {
         _bannerPlacementID = placementID;
@@ -462,19 +470,20 @@ const CGSize kVNGBannerShortSize = {300, 50};
 
 - (void)vungleWillCloseAdWithViewInfo:(nonnull VungleViewInfo *)info
                           placementID:(nonnull NSString *)placementID {
-  id<GADMAdapterVungleDelegate> delegate = [self getDelegateForPlacement:placementID];
+  id<GADMAdapterVungleDelegate> delegate = [self getDelegateForPlacement:placementID withBannerRouterDelegateState:BannerRouterDelegateStatePlaying];
   [delegate willCloseAd:[info.completedView boolValue] didDownload:[info.didDownload boolValue]];
 }
 
 - (void)vungleDidCloseAdWithViewInfo:(nonnull VungleViewInfo *)info
                          placementID:(nonnull NSString *)placementID {
+  id<GADMAdapterVungleDelegate> delegate = [self getDelegateForPlacement:placementID withBannerRouterDelegateState:BannerRouterDelegateStateClosing];
+
   if ([placementID isEqualToString:_bannerPlacementID]) {
     if (!_isBannerPresenting) {
       _bannerPlacementID = nil;
     }
   }
 
-  id<GADMAdapterVungleDelegate> delegate = [self getDelegateForPlacement:placementID];
   if (!delegate) {
     return;
   }
