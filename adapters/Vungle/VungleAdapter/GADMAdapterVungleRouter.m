@@ -145,7 +145,7 @@ const CGSize kVNGBannerShortSize = {300, 50};
           } else {
             NSOrderedSet *set = [_bannerDelegates objectForKey:bannerRequest];
             for(id<GADMAdapterVungleDelegate> delegate in set) {
-              if (delegate.bannerState == BannerRouterDelegateStateWillPlaying || delegate.bannerState == BannerRouterDelegateStatePlaying) {
+              if (delegate.bannerState == BannerRouterDelegateStateWillPlay || delegate.bannerState == BannerRouterDelegateStatePlaying) {
                 return NO;
               }
             }
@@ -418,7 +418,7 @@ const CGSize kVNGBannerShortSize = {300, 50};
       return;
     }
 
-    if ((_isBannerPresenting && delegate.bannerState == BannerRouterDelegateStatePlaying) || delegate.bannerState == BannerRouterDelegateStateWillPlaying) {
+    if ((_isBannerPresenting && delegate.bannerState == BannerRouterDelegateStatePlaying) || delegate.bannerState == BannerRouterDelegateStateWillPlay) {
       NSLog(@"Vungle: Triggering an ad completion call for %@", delegate.desiredPlacement);
 
       [[VungleSDK sharedSDK] finishedDisplayingAd];
@@ -445,11 +445,11 @@ const CGSize kVNGBannerShortSize = {300, 50};
     return;
   }
 
-  id<GADMAdapterVungleDelegate> delegate = [self getDelegateForPlacement:placementID withBannerRouterDelegateState:BannerRouterDelegateStateWillPlaying];
+  id<GADMAdapterVungleDelegate> delegate = [self getDelegateForPlacement:placementID withBannerRouterDelegateState:BannerRouterDelegateStateWillPlay];
   // The delegate is not Interstitial or Rewarded Video Ad
   if (!delegate && ! _bannerPlacementID) {
     _bannerPlacementID = placementID;
-    delegate = [self getDelegateForPlacement:placementID withBannerRouterDelegateState:BannerRouterDelegateStateWillPlaying];
+    delegate = [self getDelegateForPlacement:placementID withBannerRouterDelegateState:BannerRouterDelegateStateWillPlay];
   }
 
   [delegate willShowAd];

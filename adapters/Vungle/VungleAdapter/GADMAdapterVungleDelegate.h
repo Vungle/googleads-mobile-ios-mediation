@@ -27,7 +27,7 @@ typedef NS_ENUM(NSUInteger, GADMAdapterVungleAdType) {
 typedef NS_ENUM(NSUInteger, BannerRouterDelegateState) {
   BannerRouterDelegateStateRequesting,
   BannerRouterDelegateStateCached,
-  BannerRouterDelegateStateWillPlaying,
+  BannerRouterDelegateStateWillPlay,
   BannerRouterDelegateStatePlaying,
   BannerRouterDelegateStateClosing,
   BannerRouterDelegateStateClosed

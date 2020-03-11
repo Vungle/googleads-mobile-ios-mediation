@@ -225,7 +225,7 @@
     return;
   }
 
-  self.bannerState = BannerRouterDelegateStateWillPlaying;
+  self.bannerState = BannerRouterDelegateStateWillPlay;
   [_connector adapter:self didReceiveAdView:bannerView];
 }
 
