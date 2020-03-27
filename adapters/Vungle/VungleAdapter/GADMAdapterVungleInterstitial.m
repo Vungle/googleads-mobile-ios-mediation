@@ -246,6 +246,7 @@
 @synthesize bannerState;
 @synthesize bannerRequest;
 @synthesize isRefreshedForBannerAd;
+@synthesize isRequestingBannerAdForRefresh;
 
 - (void)initialized:(BOOL)isSuccess error:(nullable NSError *)error {
   if (!isSuccess) {

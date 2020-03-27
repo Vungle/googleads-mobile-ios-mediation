@@ -64,4 +64,7 @@ typedef NS_ENUM(NSUInteger, BannerRouterDelegateState) {
 // Is a refreshed Banner request
 @property(nonatomic, assign) BOOL isRefreshedForBannerAd;
 
+// Is request a Banner ad for a refresh request
+@property(nonatomic, assign) BOOL isRequestingBannerAdForRefresh;
+
 @end
