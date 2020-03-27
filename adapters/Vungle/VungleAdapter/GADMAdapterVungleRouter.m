@@ -159,10 +159,10 @@ const CGSize kVNGBannerShortSize = {300, 50};
       } else {
         id<GADMAdapterVungleDelegate> bannerDelegate = [_bannerDelegates objectForKey:delegate.bannerRequest];
 
-        /* This flag is used for an edge case, when the old Banner delegate is removed from
-         * _bannerDelegates and there is a refresh Banner delegate doesn't construct Banner view
-         * successfully and add to _bannerDelegates yet. Adapter cannot set _bannerRequest to nil
-         * to prevent requesting another Banner ad with different bannerRequest.
+        /* The isRequestingBannerAdForRefresh flag is used for an edge case, when the old Banner
+         * delegate is removed from _bannerDelegates and there is a refresh Banner delegate doesn't
+         * construct Banner view successfully and add to _bannerDelegates yet. Adapter cannot set
+         * _bannerRequest to nil to prevent requesting another Banner ad with different bannerRequest.
          */
         bannerDelegate.isRequestingBannerAdForRefresh = YES;
         delegate.isRefreshedForBannerAd = YES;
