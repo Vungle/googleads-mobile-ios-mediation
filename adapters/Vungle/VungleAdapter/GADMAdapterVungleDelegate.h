@@ -61,4 +61,7 @@ typedef NS_ENUM(NSUInteger, BannerRouterDelegateState) {
 // Vungle banner ad state.
 @property(nonatomic, assign) BannerRouterDelegateState bannerState;
 
+// Is a refreshed Banner request
+@property(nonatomic, assign) BOOL isRefreshedForBannerAd;
+
 @end
