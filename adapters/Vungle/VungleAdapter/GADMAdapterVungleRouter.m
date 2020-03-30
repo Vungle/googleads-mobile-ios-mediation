@@ -139,16 +139,16 @@ const CGSize kVNGBannerShortSize = {300, 50};
 
       if (![_bannerDelegates objectForKey:delegate.bannerRequest]) {
         NSEnumerator *enumerator = _bannerDelegates.keyEnumerator;
-        GADMAdapterVungleBannerRequest *bannerRequest = nil;
-        while (bannerRequest = [enumerator nextObject]) {
+        GADMAdapterVungleBannerRequest *vungleBannerRequest = nil;
+        while (vungleBannerRequest = [enumerator nextObject]) {
           // There is already a banner delegate with same placementID
           // but different uniquePubRequestID in _bannerDelegates.
-          if ([bannerRequest.placementID isEqualToString:delegate.bannerRequest.placementID]) {
+          if ([vungleBannerRequest.placementID isEqualToString:delegate.bannerRequest.placementID]) {
             return NO;
-          } else if (bannerRequest.placementID && ![bannerRequest.placementID isEqualToString:delegate.bannerRequest.placementID]) {
+          } else if (vungleBannerRequest.placementID.length > 0 && ![vungleBannerRequest.placementID isEqualToString:delegate.bannerRequest.placementID]) {
             // There is already a banner delegate with different placementID in _bannerDelegates.
             if (!_bannerRequest) {
-              _bannerRequest = [bannerRequest copy];
+              _bannerRequest = [vungleBannerRequest copy];
             }
             return NO;
           }
@@ -201,10 +201,10 @@ const CGSize kVNGBannerShortSize = {300, 50};
   if ([placement isEqualToString:_bannerRequest.placementID]) {
     @synchronized(_bannerDelegates) {
       NSEnumerator *enumerator = _bannerDelegates.keyEnumerator;
-      GADMAdapterVungleBannerRequest *bannerRequest = nil;
-      while (bannerRequest = [enumerator nextObject]) {
-        if ([bannerRequest.placementID isEqualToString:placement]) {
-          id<GADMAdapterVungleDelegate> bannerDelegate = [_bannerDelegates objectForKey:bannerRequest];
+      GADMAdapterVungleBannerRequest *vungleBannerRequest = nil;
+      while (vungleBannerRequest = [enumerator nextObject]) {
+        if ([vungleBannerRequest.placementID isEqualToString:placement]) {
+          id<GADMAdapterVungleDelegate> bannerDelegate = [_bannerDelegates objectForKey:vungleBannerRequest];
           if (bannerDelegate.bannerState == bannerState) {
             return bannerDelegate;
           }
