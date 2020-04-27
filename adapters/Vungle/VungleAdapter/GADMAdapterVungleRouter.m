@@ -99,7 +99,7 @@ static NSString *const _Nonnull kGADMAdapterVungleNullPubRequestID = @"null";
   // Set init options for priority placement
   NSMutableDictionary *initOptions = [NSMutableDictionary dictionary];
   if (delegate) {
-    NSString *priorityPlacementID = delegate.desiredPlacement ? delegate.desiredPlacement : @"";
+    NSString *priorityPlacementID = delegate.desiredPlacement;
     [initOptions setObject:priorityPlacementID forKey:VungleSDKInitOptionKeyPriorityPlacementID];
 
     NSInteger priorityPlacementAdSize = 1;
@@ -111,7 +111,7 @@ static NSString *const _Nonnull kGADMAdapterVungleNullPubRequestID = @"null";
   }
      
   NSError *err = nil;
-    [sdk startWithAppId:appId options:initOptions error:&err];
+  [sdk startWithAppId:appId options:initOptions error:&err];
   if (err) {
     [self initialized:NO error:err];
   }
