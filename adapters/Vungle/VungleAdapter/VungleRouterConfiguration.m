@@ -22,6 +22,14 @@ static NSString *const kAdapterMinimumFileSystemSizeForAssetDownload =
   [VungleSDK setPublishIDFV:publish];
 }
 
++ (void)setCCPAStatus:(VungleCCPAStatus)ccpaStatus {
+  [[VungleSDK sharedSDK] updateCCPAStatus:ccpaStatus];
+}
+
++ (VungleCCPAStatus)getCCPAStatus {
+  return [[VungleSDK sharedSDK] getCurrentCCPAStatus];
+}
+
 + (void)setMinSpaceForInit:(int)size {
   if (size >= 0) {
     [[NSUserDefaults standardUserDefaults] setInteger:size

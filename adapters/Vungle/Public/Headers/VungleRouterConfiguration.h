@@ -16,8 +16,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSInteger, VungleCCPAStatus);
+
 @interface VungleRouterConfiguration : NSObject
 + (void)setPublishIDFV:(BOOL)publish;
++ (void)setCCPAStatus:(VungleCCPAStatus)ccpaStatus;
++ (VungleCCPAStatus)getCCPAStatus;
 + (void)setMinSpaceForInit:(int)size;
 + (void)setMinSpaceForAdLoad:(int)size;
 @end
