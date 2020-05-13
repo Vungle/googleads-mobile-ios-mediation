@@ -22,12 +22,13 @@ static NSString *const kAdapterMinimumFileSystemSizeForAssetDownload =
   [VungleSDK setPublishIDFV:publish];
 }
 
-+ (void)setCCPAStatus:(VungleCCPAStatus)ccpaStatus {
-  [[VungleSDK sharedSDK] updateCCPAStatus:ccpaStatus];
++ (void)setCCPAStatus:(GADMAdapterVungleCCPAStatus)ccpaStatus {
+  VungleCCPAStatus vungleCCPAStatus = (VungleCCPAStatus)ccpaStatus;
+  [[VungleSDK sharedSDK] updateCCPAStatus:vungleCCPAStatus];
 }
 
-+ (VungleCCPAStatus)getCCPAStatus {
-  return [[VungleSDK sharedSDK] getCurrentCCPAStatus];
++ (GADMAdapterVungleCCPAStatus)getCCPAStatus {
+  return (GADMAdapterVungleCCPAStatus)[[VungleSDK sharedSDK] getCurrentCCPAStatus];
 }
 
 + (void)setMinSpaceForInit:(int)size {
