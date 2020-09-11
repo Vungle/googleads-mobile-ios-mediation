@@ -3,6 +3,7 @@
 #### Version 6.8.0.0
 - Verified compatibility with Vungle SDK 6.8.0.
 - Now requires Google Mobile Ads SDK version 7.65.0 or higher.
+- Remove VungleSDKResetPlacementForDifferentAdSize error check for loading Ads.
 
 Build and tested with
 - Google Mobile Ads SDK version 7.65.0.
