@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,20 +15,16 @@
 #import <Foundation/Foundation.h>
 #import <GoogleMobileAds/GoogleMobileAds.h>
 
-@interface GADMAdapterVungleBanner : NSObject
+@interface GADMediationVungleInterstitial : NSObject
 
-/// Initializes a new instance with |connector| and |adapter|.
-- (nonnull instancetype)initWithGADMAdNetworkConnector:(nonnull id<GADMAdNetworkConnector>)connector
-                                               adapter:(nonnull id<GADMAdNetworkAdapter>)adapter
-    NS_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)
+    initWithAdConfiguration:(nonnull GADMediationInterstitialAdConfiguration *)adConfiguration
+          completionHandler:(nonnull GADMediationInterstitialLoadCompletionHandler)handler;
 
 /// Unavailable.
 - (nonnull instancetype)init NS_UNAVAILABLE;
 
-/// Requests a banner ad from Vungle with the given adSize.
-- (void)getBannerWithSize:(GADAdSize)adSize;
-
-/// Destroy and cleanup Vungle's banner ad.
-- (void)cleanUp;
+/// Requests a interstitial ad from Vungle.
+- (void)requestInterstitialAd;
 
 @end

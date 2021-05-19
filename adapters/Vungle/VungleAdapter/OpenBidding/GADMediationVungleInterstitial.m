@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,51 +12,53 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#import "GADMAdapterVungleRewardedAd.h"
+#import "GADMediationVungleInterstitial.h"
 #include <stdatomic.h>
 #import "GADMAdapterVungleConstants.h"
 #import "GADMAdapterVungleRouter.h"
 #import "GADMAdapterVungleUtils.h"
 
-@interface GADMAdapterVungleRewardedAd () <GADMAdapterVungleDelegate>
+@interface GADMediationVungleInterstitial () <GADMAdapterVungleDelegate, GADMediationInterstitialAd>
 @end
 
-@implementation GADMAdapterVungleRewardedAd {
+@implementation GADMediationVungleInterstitial {
   /// Ad configuration for the ad to be loaded.
-  GADMediationRewardedAdConfiguration *_adConfiguration;
+  GADMediationInterstitialAdConfiguration *_adConfiguration;
 
   /// The completion handler to call when an ad loads successfully or fails.
-  GADMediationRewardedLoadCompletionHandler _adLoadCompletionHandler;
+  GADMediationInterstitialLoadCompletionHandler _adLoadCompletionHandler;
 
   /// The ad event delegate to forward ad rendering events to the Google Mobile Ads SDK.
-  id<GADMediationRewardedAdEventDelegate> _delegate;
+  id<GADMediationInterstitialAdEventDelegate> _delegate;
 
-  /// Indicates whether the rewarded ad is loaded.
+  /// Indicates whether an interstitial ad is loaded.
   BOOL _isAdLoaded;
 }
 
-- (nonnull instancetype)
-    initWithAdConfiguration:(nonnull GADMediationRewardedAdConfiguration *)adConfiguration
-          completionHandler:(nonnull GADMediationRewardedLoadCompletionHandler)handler {
+@synthesize desiredPlacement;
+
+#pragma mark - GADMediationVungleInterstitial Methods
+
+- (nonnull instancetype)initWithAdConfiguration:(nonnull GADMediationInterstitialAdConfiguration*)adConfiguration
+                              completionHandler:(nonnull GADMediationInterstitialLoadCompletionHandler)completionHandler {
   self = [super init];
   if (self) {
     _adConfiguration = adConfiguration;
+    self.desiredPlacement = [GADMAdapterVungleUtils findPlacement:adConfiguration.credentials.settings networkExtras:adConfiguration.extras];
 
     __block atomic_flag adLoadHandlerCalled = ATOMIC_FLAG_INIT;
-    __block GADMediationRewardedLoadCompletionHandler origAdLoadHandler = [handler copy];
+    __block GADMediationInterstitialLoadCompletionHandler origAdLoadHandler = [completionHandler copy];
 
-    // Ensure the original completion handler is only called once, and is deallocated once called.
-    _adLoadCompletionHandler = ^id<GADMediationRewardedAdEventDelegate>(
-        id<GADMediationRewardedAd> rewardedAd, NSError *error) {
+    /// Ensure the original completion handler is only called once, and is deallocated once called.
+    _adLoadCompletionHandler = ^id<GADMediationInterstitialAdEventDelegate>(
+      id<GADMediationInterstitialAd> ad, NSError *error) {
       if (atomic_flag_test_and_set(&adLoadHandlerCalled)) {
         return nil;
       }
-
-      id<GADMediationRewardedAdEventDelegate> delegate = nil;
+      id<GADMediationInterstitialAdEventDelegate> delegate = nil;
       if (origAdLoadHandler) {
-        delegate = origAdLoadHandler(rewardedAd, error);
+        delegate = origAdLoadHandler(ad, error);
       }
-
       origAdLoadHandler = nil;
       return delegate;
     };
@@ -64,13 +66,11 @@
   return self;
 }
 
-- (void)requestRewardedAd {
-  self.desiredPlacement =
-      [GADMAdapterVungleUtils findPlacement:_adConfiguration.credentials.settings
-                              networkExtras:_adConfiguration.extras];
+- (void)requestInterstitialAd {
   if (!self.desiredPlacement.length) {
     NSError *error = GADMAdapterVungleErrorWithCodeAndDescription(
-        GADMAdapterVungleErrorInvalidServerParameters, @"Placement ID not specified.");
+      GADMAdapterVungleErrorInvalidServerParameters,
+      @"Placement ID not specified.");
     _adLoadCompletionHandler(nil, error);
     return;
   }
@@ -83,10 +83,8 @@
     return;
   }
 
-  VungleSDK *sdk = [VungleSDK sharedSDK];
-
-  if ([sdk isInitialized]) {
-    [self loadRewardedAd];
+  if ([[GADMAdapterVungleRouter sharedInstance] isSDKInitialized]) {
+    [self loadAd];
     return;
   }
 
@@ -100,7 +98,24 @@
   [[GADMAdapterVungleRouter sharedInstance] initWithAppId:appID delegate:self];
 }
 
-- (void)loadRewardedAd {
+#pragma mark - GADMediationInterstitialAd Methods
+
+- (void)presentFromViewController:(UIViewController *)rootViewController {
+  NSError *error = nil;
+  if (![[GADMAdapterVungleRouter sharedInstance] playAd:rootViewController
+                                               delegate:self
+                                                 extras:[_adConfiguration extras]
+                                                  error:&error]) {
+    // Ad not playable.
+    if (error) {
+      [_delegate didFailToPresentWithError:error];
+    }
+  }
+}
+
+#pragma mark - Private methods
+
+- (void)loadAd {
   NSError *error = [[GADMAdapterVungleRouter sharedInstance] loadAd:self.desiredPlacement
                                                        withDelegate:self];
   if (error) {
@@ -108,31 +123,18 @@
   }
 }
 
-- (void)presentFromViewController:(nonnull UIViewController *)viewController {
-  NSError *error = nil;
-  if (![[GADMAdapterVungleRouter sharedInstance] playAd:viewController
-                                               delegate:self
-                                                 extras:[_adConfiguration extras]
-                                                  error:&error]) {
-    [_delegate didFailToPresentWithError:error];
-  }
-}
-
-- (void)dealloc {
-  _adLoadCompletionHandler = nil;
-  _adConfiguration = nil;
-}
-
 #pragma mark - VungleRouter delegates
 
-@synthesize desiredPlacement;
+- (NSString *)bidResponse {
+    return [_adConfiguration bidResponse];
+}
 
 - (void)initialized:(BOOL)isSuccess error:(nullable NSError *)error {
   if (!isSuccess) {
     _adLoadCompletionHandler(nil, error);
     return;
   }
-  [self loadRewardedAd];
+  [self loadAd];
 }
 
 - (void)adAvailable {
@@ -141,7 +143,7 @@
     return;
   }
   _isAdLoaded = YES;
-
+    
   if (_adLoadCompletionHandler) {
     _delegate = _adLoadCompletionHandler(self, nil);
   }
@@ -152,50 +154,39 @@
   }
 }
 
-- (void)didCloseAd {
-  [_delegate didDismissFullScreenView];
-
-  GADMAdapterVungleRewardedAd __weak *weakSelf = self;
-  [[GADMAdapterVungleRouter sharedInstance] removeDelegate:weakSelf];
-}
-
-- (void)willCloseAd {
-  [_delegate willDismissFullScreenView];
-}
-
-- (void)willShowAd {
-  id<GADMediationRewardedAdEventDelegate> strongDelegate = _delegate;
-  [strongDelegate willPresentFullScreenView];
-  [strongDelegate didStartVideo];
-}
-
-- (void)didViewAd {
-  [_delegate reportImpression];
-}
-
 - (void)adNotAvailable:(nonnull NSError *)error {
   if (_isAdLoaded) {
     // Already invoked an ad load callback.
     return;
   }
   _adLoadCompletionHandler(nil, error);
-  [[GADMAdapterVungleRouter sharedInstance] removeDelegate:self];
+}
+
+- (void)willShowAd {
+  [_delegate willPresentFullScreenView];
+}
+
+- (void)didViewAd {
+  // Do nothing.
+}
+
+- (void)willCloseAd {
+  [_delegate willDismissFullScreenView];
+}
+
+- (void)didCloseAd {
+  [_delegate didDismissFullScreenView];
 }
 
 - (void)trackClick {
   [_delegate reportClick];
 }
 
-- (void)rewardUser {
-  id<GADMediationRewardedAdEventDelegate> strongDelegate = _delegate;
-  [strongDelegate didEndVideo];
-  GADAdReward *reward =
-      [[GADAdReward alloc] initWithRewardType:@"vungle"
-                                 rewardAmount:[NSDecimalNumber decimalNumberWithString:@"1"]];
-  [strongDelegate didRewardUserWithReward:reward];
+- (void)willLeaveApplication {
+  [_delegate willBackgroundApplication];
 }
 
-- (void)willLeaveApplication {
+- (void)rewardUser {
   // Do nothing.
 }
 
