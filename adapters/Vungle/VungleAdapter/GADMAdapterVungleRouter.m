@@ -93,6 +93,13 @@ static NSString *const _Nonnull kGADMAdapterVungleNullPubRequestID = @"null";
   if (_isInitializing) {
     return;
   }
+    
+  if (!appId) {
+    NSError *error = GADMAdapterVungleErrorWithCodeAndDescription(
+      GADMAdapterVungleErrorInvalidServerParameters, @"Vungle app ID not specified.");
+    [delegate initialized:NO error:error];
+    return;
+  }
 
   _isInitializing = YES;
 

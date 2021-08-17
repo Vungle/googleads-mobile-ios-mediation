@@ -14,6 +14,7 @@
 
 #import "GADMediationAdapterVungle.h"
 #import "GADMAdapterVungleConstants.h"
+#import "GADMAdapterVungleNativeAd.h"
 #import "GADMAdapterVungleRewardedAd.h"
 #import "GADMAdapterVungleRouter.h"
 #import "GADMAdapterVungleUtils.h"
@@ -22,6 +23,9 @@
 @implementation GADMediationAdapterVungle {
   /// Vungle rewarded ad wrapper.
   GADMAdapterVungleRewardedAd *_rewardedAd;
+    
+  /// Vungle native ad wrapper
+  GADMAdapterVungleNativeAd *_nativeAd;
 }
 
 + (void)setUpWithConfiguration:(nonnull GADMediationServerConfiguration *)configuration
@@ -92,6 +96,13 @@
   _rewardedAd = [[GADMAdapterVungleRewardedAd alloc] initWithAdConfiguration:adConfiguration
                                                            completionHandler:completionHandler];
   [_rewardedAd requestRewardedAd];
+}
+
+- (void)loadNativeAdForAdConfiguration:(nonnull GADMediationNativeAdConfiguration *)adConfiguration
+                     completionHandler:(nonnull GADMediationNativeLoadCompletionHandler)completionHandler {
+    _nativeAd = [[GADMAdapterVungleNativeAd alloc] initNativeAdForAdConfiguration:adConfiguration
+                                                                completionHandler:completionHandler];
+    [_nativeAd requestAd];
 }
 
 @end

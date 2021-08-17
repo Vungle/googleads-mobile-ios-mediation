@@ -35,6 +35,8 @@
 /* Begin PBXBuildFile section */
 		00802E53248848850077C6D0 /* GADMAdapterVungleBanner.h in Headers */ = {isa = PBXBuildFile; fileRef = 00802E51248848850077C6D0 /* GADMAdapterVungleBanner.h */; };
 		00802E54248848850077C6D0 /* GADMAdapterVungleBanner.m in Sources */ = {isa = PBXBuildFile; fileRef = 00802E52248848850077C6D0 /* GADMAdapterVungleBanner.m */; };
+		17C5009526CC5BC300300418 /* GADMAdapterVungleNativeAd.m in Sources */ = {isa = PBXBuildFile; fileRef = 17C5009326CC5BC300300418 /* GADMAdapterVungleNativeAd.m */; };
+		17C5009626CC5BC300300418 /* GADMAdapterVungleNativeAd.h in Headers */ = {isa = PBXBuildFile; fileRef = 17C5009426CC5BC300300418 /* GADMAdapterVungleNativeAd.h */; };
 		407621A123F140B800C18557 /* VungleRouterConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4076219F23F140B800C18557 /* VungleRouterConfiguration.m */; };
 		407621A223F140B800C18557 /* VungleRouterConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 407621A023F140B800C18557 /* VungleRouterConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4552392A20B6381E0081388F /* VungleRouterConsent.m in Sources */ = {isa = PBXBuildFile; fileRef = 4552392720B6381D0081388F /* VungleRouterConsent.m */; };
@@ -91,6 +93,8 @@
 		00802E51248848850077C6D0 /* GADMAdapterVungleBanner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GADMAdapterVungleBanner.h; sourceTree = "<group>"; };
 		00802E52248848850077C6D0 /* GADMAdapterVungleBanner.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GADMAdapterVungleBanner.m; sourceTree = "<group>"; };
 		00DD26AB22F10DD20039C1D4 /* Script_Validate.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = Script_Validate.sh; sourceTree = "<group>"; };
+		17C5009326CC5BC300300418 /* GADMAdapterVungleNativeAd.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GADMAdapterVungleNativeAd.m; sourceTree = "<group>"; };
+		17C5009426CC5BC300300418 /* GADMAdapterVungleNativeAd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GADMAdapterVungleNativeAd.h; sourceTree = "<group>"; };
 		4076219F23F140B800C18557 /* VungleRouterConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VungleRouterConfiguration.m; sourceTree = "<group>"; };
 		407621A023F140B800C18557 /* VungleRouterConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VungleRouterConfiguration.h; sourceTree = "<group>"; };
 		4552392720B6381D0081388F /* VungleRouterConsent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VungleRouterConsent.m; sourceTree = "<group>"; };
@@ -156,6 +160,8 @@
 				45BFFB5822272D1000C96A67 /* GADMediationAdapterVungle.m */,
 				A85428DD1F11853A00C135E7 /* VungleAdNetworkExtras.m */,
 				4552392720B6381D0081388F /* VungleRouterConsent.m */,
+				17C5009426CC5BC300300418 /* GADMAdapterVungleNativeAd.h */,
+				17C5009326CC5BC300300418 /* GADMAdapterVungleNativeAd.m */,
 			);
 			path = VungleAdapter;
 			sourceTree = "<group>";
@@ -234,6 +240,7 @@
 				A85428E01F11853A00C135E7 /* GADMAdapterVungleInterstitial.h in Headers */,
 				45BFFB5D22272D4300C96A67 /* GADMAdapterVungleRewardedAd.h in Headers */,
 				4557855B238DE7E700523142 /* GADMAdapterVungleDelegate.h in Headers */,
+				17C5009626CC5BC300300418 /* GADMAdapterVungleNativeAd.h in Headers */,
 				458F734F2385DFF2006738A0 /* GADMAdapterVungleRouter.h in Headers */,
 				7D1575721EB7FBB200059469 /* VungleAdapter.h in Headers */,
 				56C4F0F21F29531200BABF7E /* VungleAdNetworkExtras.h in Headers */,
@@ -349,6 +356,7 @@
 				A85428E31F11853A00C135E7 /* GADMAdapterVungleRewardBasedVideoAd.m in Sources */,
 				407621A123F140B800C18557 /* VungleRouterConfiguration.m in Sources */,
 				4593F490227CE28A00F57AE5 /* GADMAdapterVungleUtils.m in Sources */,
+				17C5009526CC5BC300300418 /* GADMAdapterVungleNativeAd.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -37,5 +37,6 @@ extern const CGSize kVNGBannerShortSize;
                                     extras:(nullable VungleAdNetworkExtras *)extras
                             forPlacementID:(nonnull NSString *)placementID;
 - (void)completeBannerAdViewForPlacementID:(nonnull id<GADMAdapterVungleDelegate>)delegate;
+- (BOOL)isSDKInitialized;
 
 @end

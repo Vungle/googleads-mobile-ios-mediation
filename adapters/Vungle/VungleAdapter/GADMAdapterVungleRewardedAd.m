@@ -83,21 +83,13 @@
     return;
   }
 
-  VungleSDK *sdk = [VungleSDK sharedSDK];
-
-  if ([sdk isInitialized]) {
-    [self loadRewardedAd];
+  if (![[VungleSDK sharedSDK] isInitialized]) {
+    NSString *appID = [GADMAdapterVungleUtils findAppID:_adConfiguration.credentials.settings];
+    [[GADMAdapterVungleRouter sharedInstance] initWithAppId:appID delegate:self];
     return;
   }
-
-  NSString *appID = [GADMAdapterVungleUtils findAppID:_adConfiguration.credentials.settings];
-  if (!appID) {
-    NSError *error = GADMAdapterVungleErrorWithCodeAndDescription(
-        GADMAdapterVungleErrorInvalidServerParameters, @"Vungle app ID not specified.");
-    _adLoadCompletionHandler(nil, error);
-    return;
-  }
-  [[GADMAdapterVungleRouter sharedInstance] initWithAppId:appID delegate:self];
+    
+  [self loadRewardedAd];
 }
 
 - (void)loadRewardedAd {
