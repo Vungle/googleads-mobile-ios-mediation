@@ -81,13 +81,7 @@
     return;
   }
     
-  if ([[GADMAdapterVungleRouter sharedInstance] isSDKInitialized]) {
-    [self loadAd];
-    return;
-  }
-    
-  NSString *appID = [GADMAdapterVungleUtils findAppID:_adConfiguration.credentials.settings];
-  [[GADMAdapterVungleRouter sharedInstance] initWithAppId:appID delegate:self];
+  [self loadAd];
 }
 
 - (void)loadAd {
