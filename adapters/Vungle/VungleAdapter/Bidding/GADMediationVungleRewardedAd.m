@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#import "GADMAdapterVungleRewardedAd.h"
+#import "GADMediationVungleRewardedAd.h"
 #include <stdatomic.h>
 #import "GADMAdapterVungleConstants.h"
 #import "GADMAdapterVungleRouter.h"
 #import "GADMAdapterVungleUtils.h"
 
-@interface GADMAdapterVungleRewardedAd () <GADMAdapterVungleDelegate>
+@interface GADMediationVungleRewardedAd () <GADMAdapterVungleDelegate>
 @end
 
-@implementation GADMAdapterVungleRewardedAd {
+@implementation GADMediationVungleRewardedAd {
   /// Ad configuration for the ad to be loaded.
   GADMediationRewardedAdConfiguration *_adConfiguration;
 
@@ -34,6 +34,8 @@
   /// Indicates whether the rewarded ad is loaded.
   BOOL _isAdLoaded;
 }
+
+@synthesize desiredPlacement;
 
 - (nonnull instancetype)
     initWithAdConfiguration:(nonnull GADMediationRewardedAdConfiguration *)adConfiguration
@@ -83,12 +85,12 @@
     return;
   }
 
-  if (![[VungleSDK sharedSDK] isInitialized]) {
+  if (![[GADMAdapterVungleRouter sharedInstance] isSDKInitialized]) {
     NSString *appID = [GADMAdapterVungleUtils findAppID:_adConfiguration.credentials.settings];
     [[GADMAdapterVungleRouter sharedInstance] initWithAppId:appID delegate:self];
     return;
   }
-    
+
   [self loadRewardedAd];
 }
 
@@ -115,9 +117,11 @@
   _adConfiguration = nil;
 }
 
-#pragma mark - VungleRouter delegates
+#pragma mark - GADMAdapterVungleDelegate
 
-@synthesize desiredPlacement;
+- (NSString *)bidResponse {
+    return [_adConfiguration bidResponse];
+}
 
 - (void)initialized:(BOOL)isSuccess error:(nullable NSError *)error {
   if (!isSuccess) {
@@ -147,7 +151,7 @@
 - (void)didCloseAd {
   [_delegate didDismissFullScreenView];
 
-  GADMAdapterVungleRewardedAd __weak *weakSelf = self;
+  GADMediationVungleRewardedAd __weak *weakSelf = self;
   [[GADMAdapterVungleRouter sharedInstance] removeDelegate:weakSelf];
 }
 

@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC.
+// Copyright 2021 Google LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#import <Foundation/Foundation.h>
+#import "GADUnityBaseMediationAdapterProxy.h"
 
-/// Returns an NSError with NSLocalizedDescriptionKey and NSLocalizedFailureReasonErrorKey values
-/// set to |description|.
-NSError *GADUnityErrorWithDescription(NSString *description);
+NS_ASSUME_NONNULL_BEGIN
+
+@interface GADMUnityInterstitialMediationAdapterProxy : GADUnityBaseMediationAdapterProxy 
+- (instancetype)initWithAd:(id<GADMediationInterstitialAd>)ad completionHandler:(GADMediationInterstitialLoadCompletionHandler)completionHandler;
+@end
+
+NS_ASSUME_NONNULL_END

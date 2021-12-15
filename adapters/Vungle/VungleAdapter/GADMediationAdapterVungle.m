@@ -14,18 +14,26 @@
 
 #import "GADMediationAdapterVungle.h"
 #import "GADMAdapterVungleConstants.h"
-#import "GADMAdapterVungleNativeAd.h"
-#import "GADMAdapterVungleRewardedAd.h"
+#import "GADMediationVungleBanner.h"
+#import "GADMediationVungleInterstitial.h"
+#import "GADMediationVungleRewardedAd.h"
+#import "GADMediationVungleNativeAd.h"
 #import "GADMAdapterVungleRouter.h"
 #import "GADMAdapterVungleUtils.h"
 #import "VungleAdNetworkExtras.h"
 
 @implementation GADMediationAdapterVungle {
   /// Vungle rewarded ad wrapper.
-  GADMAdapterVungleRewardedAd *_rewardedAd;
+  GADMediationVungleRewardedAd *_rewardedAd;
+    
+  /// Vungle interstitial ad wrapper.
+  GADMediationVungleInterstitial *_interstitialAd;
+    
+  /// Vungle banner ad wrapper.
+  GADMediationVungleBanner *_bannerAd;
     
   /// Vungle native ad wrapper
-  GADMAdapterVungleNativeAd *_nativeAd;
+  GADMediationVungleNativeAd *_nativeAd;
 }
 
 + (void)setUpWithConfiguration:(nonnull GADMediationServerConfiguration *)configuration
@@ -93,16 +101,37 @@
             (nonnull GADMediationRewardedAdConfiguration *)adConfiguration
                        completionHandler:
                            (nonnull GADMediationRewardedLoadCompletionHandler)completionHandler {
-  _rewardedAd = [[GADMAdapterVungleRewardedAd alloc] initWithAdConfiguration:adConfiguration
+  _rewardedAd = [[GADMediationVungleRewardedAd alloc] initWithAdConfiguration:adConfiguration
                                                            completionHandler:completionHandler];
   [_rewardedAd requestRewardedAd];
 }
 
+- (void)loadInterstitialForAdConfiguration:(nonnull GADMediationInterstitialAdConfiguration *)adConfiguration
+                         completionHandler:(nonnull GADMediationInterstitialLoadCompletionHandler)completionHandler {
+    _interstitialAd = [[GADMediationVungleInterstitial alloc] initWithAdConfiguration:adConfiguration
+                                                                    completionHandler:completionHandler];
+    [_interstitialAd requestInterstitialAd];
+}
+
+- (void)loadBannerForAdConfiguration:(nonnull GADMediationBannerAdConfiguration *)adConfiguration
+                   completionHandler:(nonnull GADMediationBannerLoadCompletionHandler)completionHandler {
+    _bannerAd = [[GADMediationVungleBanner alloc] initWithAdConfiguration:adConfiguration
+                                                        completionHandler:completionHandler];
+    [_bannerAd requestBannerAd];
+}
+
 - (void)loadNativeAdForAdConfiguration:(nonnull GADMediationNativeAdConfiguration *)adConfiguration
                      completionHandler:(nonnull GADMediationNativeLoadCompletionHandler)completionHandler {
-    _nativeAd = [[GADMAdapterVungleNativeAd alloc] initNativeAdForAdConfiguration:adConfiguration
+    _nativeAd = [[GADMediationVungleNativeAd alloc] initNativeAdForAdConfiguration:adConfiguration
                                                                 completionHandler:completionHandler];
     [_nativeAd requestAd];
+}
+
+#pragma mark GADRTBAdapter implementation
+
+- (void)collectSignalsForRequestParameters:(nonnull GADRTBRequestParameters *)params
+                         completionHandler:(nonnull GADRTBSignalCompletionHandler)completionHandler {
+    completionHandler([[GADMAdapterVungleRouter sharedInstance] getSuperToken], nil);
 }
 
 @end

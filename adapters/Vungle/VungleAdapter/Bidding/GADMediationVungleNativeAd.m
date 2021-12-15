@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#import "GADMAdapterVungleNativeAd.h"
+#import "GADMediationVungleNativeAd.h"
 #include <stdatomic.h>
 #import "GADMAdapterVungleUtils.h"
 #import "GADMAdapterVungleRouter.h"
 #import <VungleSDK/VungleNativeAd.h>
 
-@interface GADMAdapterVungleNativeAd () <GADMediationNativeAd, VungleNativeAdDelegate, GADMAdapterVungleDelegate>
+@interface GADMediationVungleNativeAd () <GADMediationNativeAd, VungleNativeAdDelegate, GADMAdapterVungleDelegate>
 
 @end
 
-@implementation GADMAdapterVungleNativeAd {
+@implementation GADMediationVungleNativeAd {
   /// Ad configuration for the ad to be loaded.
   GADMediationNativeAdConfiguration *_adConfiguration;
 
@@ -190,7 +190,7 @@
 - (void)initialized:(BOOL)isSuccess error:(nullable NSError *)error {
   if (isSuccess) {
     // Native ads are object based. Don't need the Router to manage the delegates except for lazy initialization
-    GADMAdapterVungleNativeAd __weak *weakSelf = self;
+    GADMediationVungleNativeAd __weak *weakSelf = self;
     [[GADMAdapterVungleRouter sharedInstance] removeDelegate:weakSelf];
     [self loadAd];
   } else {
