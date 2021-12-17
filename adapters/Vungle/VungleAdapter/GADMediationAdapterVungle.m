@@ -17,6 +17,7 @@
 #import "GADMediationVungleBanner.h"
 #import "GADMediationVungleInterstitial.h"
 #import "GADMediationVungleRewardedAd.h"
+#import "GADMediationVungleNativeAd.h"
 #import "GADMAdapterVungleRouter.h"
 #import "GADMAdapterVungleUtils.h"
 #import "VungleAdNetworkExtras.h"
@@ -30,6 +31,9 @@
     
   /// Vungle banner ad wrapper.
   GADMediationVungleBanner *_bannerAd;
+    
+  /// Vungle native ad wrapper
+  GADMediationVungleNativeAd *_nativeAd;
 }
 
 + (void)setUpWithConfiguration:(nonnull GADMediationServerConfiguration *)configuration
@@ -114,6 +118,13 @@
     _bannerAd = [[GADMediationVungleBanner alloc] initWithAdConfiguration:adConfiguration
                                                         completionHandler:completionHandler];
     [_bannerAd requestBannerAd];
+}
+
+- (void)loadNativeAdForAdConfiguration:(nonnull GADMediationNativeAdConfiguration *)adConfiguration
+                     completionHandler:(nonnull GADMediationNativeLoadCompletionHandler)completionHandler {
+    _nativeAd = [[GADMediationVungleNativeAd alloc] initNativeAdForAdConfiguration:adConfiguration
+                                                                completionHandler:completionHandler];
+    [_nativeAd requestAd];
 }
 
 #pragma mark GADRTBAdapter implementation
