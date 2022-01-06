@@ -125,7 +125,7 @@
 }
 
 - (nullable NSString *)advertiser {
-  return nil;
+  return _nativeAd.sponsoredText;
 }
 
 - (nullable NSDictionary<NSString *, id> *)extraAssets {
