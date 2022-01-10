@@ -158,6 +158,10 @@
   [_delegate willPresentFullScreenView];
 }
 
+- (void)didShowAd {
+  // Do nothing.
+}
+
 - (void)didViewAd {
   // Do nothing.
 }
