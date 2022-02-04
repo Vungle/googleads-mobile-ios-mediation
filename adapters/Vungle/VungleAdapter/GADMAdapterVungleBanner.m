@@ -217,7 +217,6 @@
 
 - (void)trackClick {
   [_connector adapterDidGetAdClick:_adapter];
-  [_connector adapterWillPresentFullScreenModal:_adapter];
 }
 
 - (void)willLeaveApplication {
