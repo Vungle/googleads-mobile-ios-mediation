@@ -87,9 +87,6 @@
 
 - (void)loadAd {
   [[GADMAdapterVungleRouter sharedInstance] setCOPPAStatus:_adConfiguration.childDirectedTreatment];
-  if (_adConfiguration.childDirectedTreatment) {
-    [[VungleSDK sharedSDK] updateCOPPAStatus:[_adConfiguration.childDirectedTreatment boolValue]];
-  }
   _nativeAd = [[VungleNativeAd alloc] initWithPlacementID:self.desiredPlacement];
   _nativeAd.delegate = self;
   VungleAdNetworkExtras *networkExtras = [_adConfiguration extras];
