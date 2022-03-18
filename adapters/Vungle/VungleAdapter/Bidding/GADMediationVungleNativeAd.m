@@ -93,6 +93,7 @@
     _nativeAd.adOptionsPosition = networkExtras.nativeAdOptionPosition;
   }
   [_nativeAd loadAd];
+  [[VungleSDK sharedSDK] updateCOPPAStatus:_adConfiguration.childDirectedTreatment];
 }
 
 #pragma mark - GADMediatedUnifiedNativeAd
