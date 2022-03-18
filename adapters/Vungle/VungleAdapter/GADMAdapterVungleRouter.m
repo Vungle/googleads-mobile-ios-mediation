@@ -292,9 +292,7 @@ static NSString *const _Nonnull GADMAdapterVungleNullPubRequestID = @"null";
 - (nullable NSError *)loadAd:(nonnull NSString *)placement
                 withDelegate:(nonnull id<GADMAdapterVungleDelegate>)delegate
                        coppa:(NSNumber *)coppa {
-  if (coppa) {
-      [[VungleSDK sharedSDK] updateCOPPAStatus:[coppa boolValue]];
-  }
+  [self setCOPPAStatus:coppa];
   id<GADMAdapterVungleDelegate> adapterDelegate = [self getDelegateForPlacement:placement];
   if (adapterDelegate) {
     NSError *error = GADMAdapterVungleErrorWithCodeAndDescription(
@@ -466,6 +464,13 @@ static NSString *const _Nonnull GADMAdapterVungleNullPubRequestID = @"null";
 - (NSString *)getSuperToken {
   return [[VungleSDK sharedSDK] currentSuperToken];
 }
+
+- (void)setCOPPAStatus:(NSNumber *)coppa {
+    if (coppa) {
+        [[VungleSDK sharedSDK] updateCOPPAStatus:[coppa boolValue]];
+    }
+}
+
 
 #pragma mark - VungleSDKDelegate methods
 

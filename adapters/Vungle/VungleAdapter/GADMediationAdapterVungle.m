@@ -101,6 +101,7 @@
             (nonnull GADMediationRewardedAdConfiguration *)adConfiguration
                        completionHandler:
                            (nonnull GADMediationRewardedLoadCompletionHandler)completionHandler {
+  [[GADMAdapterVungleRouter sharedInstance] setCOPPAStatus:adConfiguration.childDirectedTreatment];
   _rewardedAd = [[GADMediationVungleRewardedAd alloc] initWithAdConfiguration:adConfiguration
                                                             completionHandler:completionHandler];
   [_rewardedAd requestRewardedAd];
@@ -110,6 +111,7 @@
             (nonnull GADMediationInterstitialAdConfiguration *)adConfiguration
                          completionHandler:(nonnull GADMediationInterstitialLoadCompletionHandler)
                                                completionHandler {
+  [[GADMAdapterVungleRouter sharedInstance] setCOPPAStatus:adConfiguration.childDirectedTreatment];
   _interstitialAd =
       [[GADMediationVungleInterstitial alloc] initWithAdConfiguration:adConfiguration
                                                     completionHandler:completionHandler];
@@ -119,6 +121,7 @@
 - (void)loadBannerForAdConfiguration:(nonnull GADMediationBannerAdConfiguration *)adConfiguration
                    completionHandler:
                        (nonnull GADMediationBannerLoadCompletionHandler)completionHandler {
+  [[GADMAdapterVungleRouter sharedInstance] setCOPPAStatus:adConfiguration.childDirectedTreatment];
   _bannerAd = [[GADMediationVungleBanner alloc] initWithAdConfiguration:adConfiguration
                                                       completionHandler:completionHandler];
   [_bannerAd requestBannerAd];
@@ -126,6 +129,7 @@
 
 - (void)loadNativeAdForAdConfiguration:(nonnull GADMediationNativeAdConfiguration *)adConfiguration
                      completionHandler:(nonnull GADMediationNativeLoadCompletionHandler)completionHandler {
+    [[GADMAdapterVungleRouter sharedInstance] setCOPPAStatus:adConfiguration.childDirectedTreatment];
     _nativeAd = [[GADMediationVungleNativeAd alloc] initNativeAdForAdConfiguration:adConfiguration
                                                                 completionHandler:completionHandler];
     [_nativeAd requestAd];
