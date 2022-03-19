@@ -86,7 +86,6 @@
 }
 
 - (void)loadAd {
-  [[GADMAdapterVungleRouter sharedInstance] setCOPPAStatus:_adConfiguration.childDirectedTreatment];
   _nativeAd = [[VungleNativeAd alloc] initWithPlacementID:self.desiredPlacement];
   _nativeAd.delegate = self;
   VungleAdNetworkExtras *networkExtras = [_adConfiguration extras];
