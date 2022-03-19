@@ -122,8 +122,7 @@
 
 - (void)loadAd {
   NSError *error = [[GADMAdapterVungleRouter sharedInstance] loadAd:self.desiredPlacement
-                                                       withDelegate:self
-                                                              coppa:_connector.childDirectedTreatment];
+                                                       withDelegate:self];
   if (error) {
     [_connector adapter:_adapter didFailAd:error];
   }

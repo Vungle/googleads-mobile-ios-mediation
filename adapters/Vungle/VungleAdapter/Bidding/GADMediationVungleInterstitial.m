@@ -109,8 +109,7 @@
 
 - (void)loadAd {
   NSError *error = [[GADMAdapterVungleRouter sharedInstance] loadAd:self.desiredPlacement
-                                                       withDelegate:self
-                                                              coppa:_adConfiguration.childDirectedTreatment];
+                                                       withDelegate:self];
   if (error) {
     _adLoadCompletionHandler(nil, error);
   }

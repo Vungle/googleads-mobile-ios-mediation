@@ -290,9 +290,7 @@ static NSString *const _Nonnull GADMAdapterVungleNullPubRequestID = @"null";
 }
 
 - (nullable NSError *)loadAd:(nonnull NSString *)placement
-                withDelegate:(nonnull id<GADMAdapterVungleDelegate>)delegate
-                       coppa:(NSNumber *)coppa {
-  [self setCOPPAStatus:coppa];
+                withDelegate:(nonnull id<GADMAdapterVungleDelegate>)delegate {
   id<GADMAdapterVungleDelegate> adapterDelegate = [self getDelegateForPlacement:placement];
   if (adapterDelegate) {
     NSError *error = GADMAdapterVungleErrorWithCodeAndDescription(

@@ -29,8 +29,7 @@ extern const CGSize kVNGBannerShortSize;
         extras:(nullable VungleAdNetworkExtras *)extras
          error:(NSError *_Nullable __autoreleasing *_Nullable)error;
 - (nullable NSError *)loadAd:(nonnull NSString *)placement
-                withDelegate:(nonnull id<GADMAdapterVungleDelegate>)delegate
-                       coppa:(nullable NSNumber *)coppa;
+                withDelegate:(nonnull id<GADMAdapterVungleDelegate>)delegate;
 - (void)removeDelegate:(nonnull id<GADMAdapterVungleDelegate>)delegate;
 - (BOOL)hasDelegateForPlacementID:(nonnull NSString *)placementID;
 - (nullable NSError *)renderBannerAdInView:(nonnull UIView *)bannerView
