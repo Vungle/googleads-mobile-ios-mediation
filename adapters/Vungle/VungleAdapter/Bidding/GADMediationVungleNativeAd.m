@@ -92,7 +92,7 @@
   if (networkExtras.nativeAdOptionPosition != 0) {
     _nativeAd.adOptionsPosition = networkExtras.nativeAdOptionPosition;
   }
-  [_nativeAd loadAd];
+  [_nativeAd loadAdWithAdMarkup:[self bidResponse]];
 }
 
 #pragma mark - GADMediatedUnifiedNativeAd
