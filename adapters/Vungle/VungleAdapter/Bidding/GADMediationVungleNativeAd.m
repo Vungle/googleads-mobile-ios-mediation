@@ -40,6 +40,7 @@
 }
 
 @synthesize desiredPlacement;
+@synthesize isAdLoaded;
 
 - (nonnull instancetype)initNativeAdForAdConfiguration:(nonnull GADMediationNativeAdConfiguration *)adConfiguration
                                      completionHandler:(nonnull GADMediationNativeLoadCompletionHandler)completionHandler {
