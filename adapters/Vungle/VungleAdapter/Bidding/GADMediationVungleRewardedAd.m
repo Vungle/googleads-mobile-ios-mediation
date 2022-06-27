@@ -152,13 +152,11 @@
 }
 
 - (void)willShowAd {
-  id<GADMediationRewardedAdEventDelegate> strongDelegate = _delegate;
-  [strongDelegate willPresentFullScreenView];
+  [_delegate willPresentFullScreenView];
 }
 
 - (void)didShowAd {
-  id<GADMediationRewardedAdEventDelegate> strongDelegate = _delegate;
-  [strongDelegate didStartVideo];
+  [_delegate didStartVideo];
 }
 
 - (void)didViewAd {
@@ -179,12 +177,11 @@
 }
 
 - (void)rewardUser {
-  id<GADMediationRewardedAdEventDelegate> strongDelegate = _delegate;
-  [strongDelegate didEndVideo];
+  [_delegate didEndVideo];
   GADAdReward *reward =
       [[GADAdReward alloc] initWithRewardType:@"vungle"
                                  rewardAmount:[NSDecimalNumber decimalNumberWithString:@"1"]];
-  [strongDelegate didRewardUserWithReward:reward];
+  [_delegate didRewardUserWithReward:reward];
 }
 
 - (void)willLeaveApplication {
