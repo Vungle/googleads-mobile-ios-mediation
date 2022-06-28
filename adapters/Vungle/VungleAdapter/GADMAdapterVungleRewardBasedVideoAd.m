@@ -155,8 +155,6 @@
 
 - (void)didCloseAd {
   [_delegate didDismissFullScreenView];
-
-  [GADMAdapterVungleRouter.sharedInstance removeDelegate:self];
 }
 
 - (void)willCloseAd {
@@ -181,7 +179,6 @@
     return;
   }
   _adLoadCompletionHandler(nil, error);
-  [GADMAdapterVungleRouter.sharedInstance removeDelegate:self];
 }
 
 - (void)trackClick {

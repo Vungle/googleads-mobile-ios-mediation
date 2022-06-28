@@ -143,8 +143,6 @@
 
 - (void)didCloseAd {
   [_delegate didDismissFullScreenView];
-
-  [GADMAdapterVungleBiddingRouter.sharedInstance removeDelegate:self];
 }
 
 - (void)willCloseAd {
@@ -169,7 +167,6 @@
     return;
   }
   _adLoadCompletionHandler(nil, error);
-  [GADMAdapterVungleBiddingRouter.sharedInstance removeDelegate:self];
 }
 
 - (void)trackClick {
