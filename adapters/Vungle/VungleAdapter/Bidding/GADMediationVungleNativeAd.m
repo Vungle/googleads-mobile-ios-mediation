@@ -105,7 +105,7 @@
 #pragma mark - GADMediatedUnifiedNativeAd
 
 - (nullable NSString *)headline {
-    return _nativeAd.title;
+  return _nativeAd.title;
 }
 
 - (nullable NSArray<GADNativeAdImage *> *)images {
@@ -113,15 +113,18 @@
 }
 
 - (nullable NSString *)body {
-    return _nativeAd.bodyText;
+  return _nativeAd.bodyText;
 }
 
 - (nullable GADNativeAdImage *)icon {
+  if (_nativeAd.iconImage) {
     return [[GADNativeAdImage alloc] initWithImage:_nativeAd.iconImage];
+  }
+  return nil;
 }
 
 - (nullable NSString *)callToAction {
-    return _nativeAd.callToAction;
+  return _nativeAd.callToAction;
 }
 
 - (nullable NSDecimalNumber *)starRating {
@@ -248,7 +251,7 @@
 }
 
 - (nullable NSString *)bidResponse {
-    return [_adConfiguration bidResponse];
+  return [_adConfiguration bidResponse];
 }
 
 @end
