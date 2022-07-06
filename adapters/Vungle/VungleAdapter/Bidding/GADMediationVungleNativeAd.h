@@ -24,7 +24,7 @@
 /// Constructor is unavailable. Please use initWithAdConfiguration:completionHandler:.
 - (nonnull instancetype)init NS_UNAVAILABLE;
 
-/// Requests a rewarded ad from Vungle.
+/// Requests a native ad from Vungle.
 - (void)requestNativeAd;
 
 @end
