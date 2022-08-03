@@ -30,8 +30,7 @@
 }
 
 + (void)updateIDFVStatus:(BOOL)optIn {
-    // TODO
-//  [VunglePrivacySettings :optIn];
+  [VunglePrivacySettings setPublishIdfv:optIn];
 }
 
 @end
