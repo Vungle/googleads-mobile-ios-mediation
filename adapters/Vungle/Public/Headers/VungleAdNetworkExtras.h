@@ -26,6 +26,10 @@
 
 @property(nonatomic, copy) NSString *_Nullable playingPlacement;
 
+/*!
+ * @brief NSInteger that will be passed to alter the privacy icon position for native ads.
+ * @discussion Optional. topLeft = 1, topRight = 2, bottomLeft = 3, bottomRight = 4
+ */
 @property(nonatomic, assign) NSInteger nativeAdOptionPosition;
 
 @property(nonatomic, assign) BOOL muted DEPRECATED_ATTRIBUTE;
