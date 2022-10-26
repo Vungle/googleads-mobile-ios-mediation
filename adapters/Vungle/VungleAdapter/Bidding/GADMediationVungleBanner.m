@@ -19,6 +19,9 @@
 #import "GADMAdapterVungleUtils.h"
 
 @interface GADMediationVungleBanner () <GADMAdapterVungleDelegate, GADMediationBannerAd>
+
+@property(strong) UIView *adapterView;
+
 @end
 
 @implementation GADMediationVungleBanner {
@@ -138,11 +141,6 @@
   }
 }
 
-- (void)loadFrame {
-  view = nil;
-  view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, _bannerSize.size.width, _bannerSize.size.height)];
-}
-
 - (NSError *)renderAd {
   VungleAdNetworkExtras *extras = (VungleAdNetworkExtras *)[_adConfiguration extras];
   NSMutableDictionary *options = nil;
@@ -163,11 +161,11 @@
     }
   }
   NSError *bannerError = nil;
-  BOOL success = [VungleSDK.sharedSDK addAdViewToView:self.view
-                                          withOptions:options
-                                          placementID:self.desiredPlacement
-                                                error:&bannerError];
-    return bannerError;
+  [VungleSDK.sharedSDK addAdViewToView:_adapterView
+                           withOptions:options
+                           placementID:self.desiredPlacement
+                                 error:&bannerError];
+  return bannerError;
 }
 
 - (void)cleanUp {
@@ -178,7 +176,7 @@
 
   [VungleSDK.sharedSDK finishDisplayingAd:self.desiredPlacement];
   [[GADMAdapterVungleBiddingRouter sharedInstance] removeDelegate:self];
-  view = nil;
+  _adapterView = nil;
 }
 
 #pragma mark - GADMAdapterVungleDelegate delegates
@@ -205,7 +203,13 @@
     return;
   }
   _isAdLoaded = YES;
-  [self loadFrame];
+  _adapterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, _bannerSize.size.width, _bannerSize.size.height)];
+  self.bannerState = BannerRouterDelegateStateWillPlay;
+  NSError *error = [self renderAd];
+  if (error) {
+    _adLoadCompletionHandler(nil, error);
+    return;
+  }
     
   if (_adLoadCompletionHandler) {
     _delegate = _adLoadCompletionHandler(self, nil);
@@ -213,13 +217,6 @@
 
   if (!_delegate) {
     [[GADMAdapterVungleBiddingRouter sharedInstance] removeDelegate:self];
-    return;
-  }
-    
-  self.bannerState = BannerRouterDelegateStateWillPlay;
-  NSError *error = [self renderAd];
-  if (error) {
-    [_delegate didFailToPresentWithError:error];
     return;
   }
 }
@@ -266,6 +263,12 @@
 
 - (void)didShowAd {
   // Do nothing.
+}
+
+#pragma mark GADMediationBannerAd
+
+- (UIView *)view {
+  return _adapterView;
 }
 
 @end
