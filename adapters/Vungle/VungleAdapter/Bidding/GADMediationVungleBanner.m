@@ -15,6 +15,7 @@
 #import "GADMediationVungleBanner.h"
 #include <stdatomic.h>
 #import "GADMAdapterVungleRouter.h"
+#import "GADMAdapterVungleBiddingRouter.h"
 #import "GADMAdapterVungleUtils.h"
 
 @interface GADMediationVungleBanner () <GADMAdapterVungleDelegate, GADMediationBannerAd>
@@ -46,6 +47,7 @@
 @synthesize isRefreshedForBannerAd;
 @synthesize isRequestingBannerAdForRefresh;
 @synthesize view;
+@synthesize isAdLoaded;
 
 - (void)dealloc {
     [self cleanUp];
@@ -95,9 +97,9 @@
     return;
   }
 
-  if (![[GADMAdapterVungleRouter sharedInstance] isSDKInitialized]) {
+  if (![[GADMAdapterVungleBiddingRouter sharedInstance] isSDKInitialized]) {
     NSString *appID = [GADMAdapterVungleUtils findAppID:_adConfiguration.credentials.settings];
-    [[GADMAdapterVungleRouter sharedInstance] initWithAppId:appID delegate:self];
+    [[GADMAdapterVungleBiddingRouter sharedInstance] initWithAppId:appID delegate:self];
     return;
   }
 
@@ -130,22 +132,42 @@
 }
 
 - (void)loadAd {
-  NSError *error = [[GADMAdapterVungleRouter sharedInstance] loadAd:self.desiredPlacement
-                                                       withDelegate:self];
+  NSError *error = [[GADMAdapterVungleBiddingRouter sharedInstance] loadAdWithDelegate:self];
   if (error) {
     _adLoadCompletionHandler(nil, error);
   }
 }
 
 - (void)loadFrame {
+  view = nil;
   view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, _bannerSize.size.width, _bannerSize.size.height)];
 }
 
 - (NSError *)renderAd {
-  return [[GADMAdapterVungleRouter sharedInstance] renderBannerAdInView:view
-                                                               delegate:self
-                                                                 extras:[_adConfiguration extras]
-                                                         forPlacementID:self.desiredPlacement];
+  VungleAdNetworkExtras *extras = (VungleAdNetworkExtras *)[_adConfiguration extras];
+  NSMutableDictionary *options = nil;
+  if (extras) {
+    options = [[NSMutableDictionary alloc] init];
+    if (extras.muteIsSet) {
+      GADMAdapterVungleMutableDictionarySetObjectForKey(options, VunglePlayAdOptionKeyStartMuted,
+                                                        @(extras.muted));
+    }
+    if (extras.userId) {
+      GADMAdapterVungleMutableDictionarySetObjectForKey(options, VunglePlayAdOptionKeyUser,
+                                                        extras.userId);
+    }
+    if (extras.flexViewAutoDismissSeconds) {
+      GADMAdapterVungleMutableDictionarySetObjectForKey(options,
+                                                        VunglePlayAdOptionKeyFlexViewAutoDismissSeconds,
+                                                        @(extras.flexViewAutoDismissSeconds));
+    }
+  }
+  NSError *bannerError = nil;
+  BOOL success = [VungleSDK.sharedSDK addAdViewToView:self.view
+                                          withOptions:options
+                                          placementID:self.desiredPlacement
+                                                error:&bannerError];
+    return bannerError;
 }
 
 - (void)cleanUp {
@@ -154,8 +176,8 @@
   }
   _didBannerFinishPresenting = YES;
 
-  [[GADMAdapterVungleRouter sharedInstance] completeBannerAdViewForPlacementID:self];
-  [[GADMAdapterVungleRouter sharedInstance] removeDelegate:self];
+  [VungleSDK.sharedSDK finishDisplayingAd:self.desiredPlacement];
+  [[GADMAdapterVungleBiddingRouter sharedInstance] removeDelegate:self];
   view = nil;
 }
 
@@ -190,7 +212,7 @@
   }
 
   if (!_delegate) {
-    [[GADMAdapterVungleRouter sharedInstance] removeDelegate:self];
+    [[GADMAdapterVungleBiddingRouter sharedInstance] removeDelegate:self];
     return;
   }
     
@@ -239,6 +261,10 @@
 }
 
 - (void)rewardUser {
+  // Do nothing.
+}
+
+- (void)didShowAd {
   // Do nothing.
 }
 
