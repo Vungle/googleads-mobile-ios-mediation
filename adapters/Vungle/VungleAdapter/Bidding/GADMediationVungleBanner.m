@@ -19,9 +19,6 @@
 #import "GADMAdapterVungleUtils.h"
 
 @interface GADMediationVungleBanner () <GADMAdapterVungleDelegate, GADMediationBannerAd>
-
-@property(strong) UIView *adapterView;
-
 @end
 
 @implementation GADMediationVungleBanner {
@@ -42,6 +39,9 @@
 
   /// Indicates whether the banner ad finished presenting.
   BOOL _didBannerFinishPresenting;
+    
+  /// UIView to send to Google's view property and for Vungle to mount the ad
+  UIView *_bannerView;
 }
 
 @synthesize desiredPlacement;
@@ -161,7 +161,7 @@
     }
   }
   NSError *bannerError = nil;
-  [VungleSDK.sharedSDK addAdViewToView:_adapterView
+  [VungleSDK.sharedSDK addAdViewToView:_bannerView
                            withOptions:options
                            placementID:self.desiredPlacement
                                  error:&bannerError];
@@ -176,7 +176,7 @@
 
   [VungleSDK.sharedSDK finishDisplayingAd:self.desiredPlacement adMarkup:self.bidResponse];
   [[GADMAdapterVungleBiddingRouter sharedInstance] removeDelegate:self];
-  _adapterView = nil;
+  _bannerView = nil;
 }
 
 #pragma mark - GADMAdapterVungleDelegate delegates
@@ -203,7 +203,7 @@
     return;
   }
   _isAdLoaded = YES;
-  _adapterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, _bannerSize.size.width, _bannerSize.size.height)];
+  _bannerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, _bannerSize.size.width, _bannerSize.size.height)];
   self.bannerState = BannerRouterDelegateStateWillPlay;
   NSError *error = [self renderAd];
   if (error) {
@@ -268,7 +268,7 @@
 #pragma mark GADMediationBannerAd
 
 - (UIView *)view {
-  return _adapterView;
+  return _bannerView;
 }
 
 @end
