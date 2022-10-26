@@ -174,7 +174,7 @@
   }
   _didBannerFinishPresenting = YES;
 
-  [VungleSDK.sharedSDK finishDisplayingAd:self.desiredPlacement];
+  [VungleSDK.sharedSDK finishDisplayingAd:self.desiredPlacement adMarkup:self.bidResponse];
   [[GADMAdapterVungleBiddingRouter sharedInstance] removeDelegate:self];
   _adapterView = nil;
 }
