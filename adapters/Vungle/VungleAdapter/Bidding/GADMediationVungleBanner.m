@@ -37,17 +37,19 @@
     
     /// Vungle Banner instance
     VungleBanner *_bannerAd;
+    
+    /// Banner UIView for Google's view property and for Vungle to present on
+    UIView *_bannerView;
 }
 
 @synthesize desiredPlacement;
-@synthesize view;
 
 - (void)dealloc {
   _adConfiguration = nil;
   _adLoadCompletionHandler = nil;
   _bannerAd = nil;
   _delegate = nil;
-  view = nil;
+  _bannerView = nil;
 }
 
 - (nonnull instancetype)initWithAdConfiguration:(nonnull GADMediationBannerAdConfiguration*)adConfiguration
@@ -151,17 +153,13 @@
   return BannerSizeRegular;
 }
 
-- (void)loadFrame {
-  view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, _bannerSize.size.width, _bannerSize.size.height)];
-}
-
 #pragma mark - VungleBannerDelegate
 
 - (void)bannerAdDidLoad:(VungleBanner *)banner {
-  [self loadFrame];
+  _bannerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, _bannerSize.size.width, _bannerSize.size.height)];
   if (_adLoadCompletionHandler) {
     _delegate = _adLoadCompletionHandler(self, nil);
-    [_bannerAd presentOn:view];
+    [_bannerAd presentOn:_bannerView];
   }
 }
 
@@ -217,6 +215,12 @@
     return;
   }
   [self loadAd];
+}
+
+#pragma mark GADMediationBannerAd
+
+- (UIView *)view {
+  return _bannerView;
 }
 
 @end
