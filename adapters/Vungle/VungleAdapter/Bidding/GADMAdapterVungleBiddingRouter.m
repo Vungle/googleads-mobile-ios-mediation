@@ -102,7 +102,8 @@ static NSString *const _Nonnull GADMAdapterVungleNullPubRequestID = @"null";
   }
 
   VungleSDK *sdk = VungleSDK.sharedSDK;
-  if ([delegate respondsToSelector:@selector(bannerAdSize)]) {
+  if ([delegate respondsToSelector:@selector(bannerAdSize)] &&
+      !GADAdSizeEqualToSize([delegate bannerAdSize], GADAdSizeMediumRectangle)) {
     if ([sdk isAdCachedForPlacementID:delegate.desiredPlacement
                              adMarkup:[delegate bidResponse]
                              withSize:GADMAdapterVungleAdSizeForCGSize([delegate bannerAdSize].size)]) {
@@ -118,7 +119,8 @@ static NSString *const _Nonnull GADMAdapterVungleNullPubRequestID = @"null";
   }
 
   NSError *loadError = nil;
-  if ([delegate respondsToSelector:@selector(bannerAdSize)]) {
+  if ([delegate respondsToSelector:@selector(bannerAdSize)] &&
+      !GADAdSizeEqualToSize([delegate bannerAdSize], GADAdSizeMediumRectangle)) {
     [sdk loadPlacementWithID:delegate.desiredPlacement
                     adMarkup:[delegate bidResponse]
                     withSize:GADMAdapterVungleAdSizeForCGSize([delegate bannerAdSize].size)
