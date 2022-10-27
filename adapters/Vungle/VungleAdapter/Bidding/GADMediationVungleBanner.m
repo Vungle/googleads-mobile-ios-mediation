@@ -164,6 +164,7 @@
   [VungleSDK.sharedSDK addAdViewToView:_bannerView
                            withOptions:options
                            placementID:self.desiredPlacement
+                              adMarkup:[self bidResponse]
                                  error:&bannerError];
   return bannerError;
 }
