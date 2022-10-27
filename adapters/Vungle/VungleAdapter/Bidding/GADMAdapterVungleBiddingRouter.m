@@ -167,7 +167,8 @@ static NSString *const _Nonnull GADMAdapterVungleNullPubRequestID = @"null";
   // Vungle SDK calls this method with isAdPlayable NO just after an ad is presented. These events
   // should be ignored as they aren't related to a load call. Assume that this method is called with
   // isAdPlayable NO due to an ad being presented if Vungle SDK has an ad cached for this placement.
-  if ([delegate respondsToSelector:@selector(bannerAdSize)]) {
+  if ([delegate respondsToSelector:@selector(bannerAdSize)] &&
+      !GADAdSizeEqualToSize([delegate bannerAdSize], GADAdSizeMediumRectangle)) {
     if ([VungleSDK.sharedSDK isAdCachedForPlacementID:delegate.desiredPlacement
                                              adMarkup:[delegate bidResponse]
                                              withSize:GADMAdapterVungleAdSizeForCGSize([delegate bannerAdSize].size)]) {
