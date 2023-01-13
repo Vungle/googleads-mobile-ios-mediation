@@ -101,6 +101,9 @@
 - (void)loadAd {
   _interstitialAd = [[VungleInterstitial alloc] initWithPlacementId:self.desiredPlacement];
   _interstitialAd.delegate = self;
+  VungleAdsExtras *extras = [[VungleAdsExtras alloc] init];
+  [extras setWithWatermark:[_adConfiguration.watermark base64EncodedStringWithOptions:0]];
+  [_interstitialAd setWithExtras:extras];
   [_interstitialAd load:_adConfiguration.bidResponse];
 }
 
@@ -123,7 +126,6 @@
 }
 
 - (void)interstitialAdDidPresent:(VungleInterstitial *)interstitial {
-  // No-op.
 }
 
 - (void)interstitialAdDidFailToPresent:(VungleInterstitial *)interstitial
