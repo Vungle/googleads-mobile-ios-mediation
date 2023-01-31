@@ -126,6 +126,7 @@
 }
 
 - (void)interstitialAdDidPresent:(VungleInterstitial *)interstitial {
+  // No-op.
 }
 
 - (void)interstitialAdDidFailToPresent:(VungleInterstitial *)interstitial

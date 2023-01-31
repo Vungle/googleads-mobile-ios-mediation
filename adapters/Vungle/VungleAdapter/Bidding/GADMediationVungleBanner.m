@@ -89,7 +89,7 @@
 - (void)requestBannerAd {
   if (!IsGADAdSizeValid(_bannerSize)) {
     NSString *errorMessage =
-        [NSString stringWithFormat:@"Unsupported ad size requested for Vungle. Size: %@",
+        [NSString stringWithFormat:@"The requested banner size: %@ is not supported by Vungle SDK.",
                                    NSStringFromGADAdSize(_bannerSize)];
     NSError *error = GADMAdapterVungleErrorWithCodeAndDescription(
         GADMAdapterVungleErrorBannerSizeMismatch, errorMessage);
@@ -98,8 +98,7 @@
   }
 
   if (!self.desiredPlacement.length) {
-    NSError *error = GADMAdapterVungleErrorWithCodeAndDescription(
-        GADMAdapterVungleErrorInvalidServerParameters, @"Placement ID not specified.");
+    NSError *error = GADMAdapterVungleInvalidPlacementErrorWithCodeAndDescription();
     _adLoadCompletionHandler(nil, error);
     return;
   }
@@ -187,6 +186,7 @@
 }
 
 - (void)bannerAdDidPresent:(VungleBanner *)banner {
+  // No-op.
 }
 
 - (void)bannerAdDidFailToPresent:(VungleBanner *)banner withError:(NSError *)error {
