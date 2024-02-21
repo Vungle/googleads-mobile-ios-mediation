@@ -27,8 +27,11 @@ NSError *_Nonnull GADMAdapterVungleErrorWithCodeAndDescription(GADMAdapterVungle
 
 const CGSize kVNGBannerShortSize = {300, 50};
 GADAdSize GADMAdapterVungleAdSizeForAdSize(GADAdSize adSize) {
-  if (adSize.size.height >= GADAdSizeMediumRectangle.size.height &&
-      adSize.size.width >= GADAdSizeMediumRectangle.size.width) {
+  if ((adSize.size.height >= GADAdSizeMediumRectangle.size.height &&
+      adSize.size.width >= GADAdSizeMediumRectangle.size.width) || 
+      (adSize.size.height == 0 && adSize.size.width == 0)) {
+      // VungleSDK will return MREC ad for 300 X 250 and greater OR
+      // for 0,0 provided sizes
     return GADAdSizeMediumRectangle;
   }
 
