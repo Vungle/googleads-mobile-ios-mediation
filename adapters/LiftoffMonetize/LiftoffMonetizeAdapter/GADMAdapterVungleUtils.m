@@ -27,9 +27,18 @@ NSError *_Nonnull GADMAdapterVungleErrorWithCodeAndDescription(GADMAdapterVungle
 
 const CGSize kVNGBannerShortSize = {300, 50};
 GADAdSize GADMAdapterVungleAdSizeForAdSize(GADAdSize adSize) {
+//  if ((adSize.size.height >= GADAdSizeMediumRectangle.size.height &&
+//      adSize.size.width >= GADAdSizeMediumRectangle.size.width) || 
+//      (adSize.size.height == 0 && adSize.size.width == 0)) {
   if (adSize.size.height >= GADAdSizeMediumRectangle.size.height &&
       adSize.size.width >= GADAdSizeMediumRectangle.size.width) {
+      // VungleSDK will return MREC ad for 300 X 250 and greater OR
+      // for 0,0 provided sizes
     return GADAdSizeMediumRectangle;
+  }
+  
+  if ((adSize.size.height == 0 && adSize.size.width == 0)) {
+      return GADAdSizeFluid;
   }
 
   // An array of supported ad sizes.
@@ -54,7 +63,8 @@ GADAdSize GADMAdapterVungleAdSizeForAdSize(GADAdSize adSize) {
 }
 
 BannerSize GADMAdapterVungleConvertGADAdSizeToBannerSize(GADAdSize adSize) {
-  if (GADAdSizeEqualToSize(adSize, GADAdSizeMediumRectangle)) {
+  if (GADAdSizeEqualToSize(adSize, GADAdSizeMediumRectangle) ||
+      GADAdSizeEqualToSize(adSize, GADAdSizeFluid)) {
     return BannerSizeMrec;
   }
   if (adSize.size.height == GADAdSizeLeaderboard.size.height) {

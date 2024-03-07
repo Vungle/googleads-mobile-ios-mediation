@@ -61,7 +61,7 @@
   if (!strongConnector || !strongAdapter) {
     return;
   }
-
+  NSLog(@"[FLUID BANNER TESTING - Adapter] Requested banner size received by adapter - width: %f and height: %f", adSize.size.width, adSize.size.height);
   _bannerSize = GADMAdapterVungleAdSizeForAdSize(adSize);
   if (!IsGADAdSizeValid(_bannerSize)) {
     NSString *errorMessage =
@@ -92,11 +92,21 @@
   [_bannerAd load:nil];
 }
 
+- (CGSize)updateBannerViewSizeIfNeeded {
+    if (GADAdSizeEqualToSize(_bannerSize, GADAdSizeFluid)) {
+        NSLog(@"[FLUID BANNER TESTING - Adapter] BannerView size has to be updated to allow presentation without errors from VungleSDK");
+        return CGSizeMake(300, 250);
+    }
+    return _bannerSize.size;
+}
+
 #pragma mark - VungleBannerDelegate
 
 - (void)bannerAdDidLoad:(nonnull VungleBanner *)banner {
+    CGSize updatedBannerSize = [self updateBannerViewSizeIfNeeded];
   _bannerView = [[UIView alloc]
-      initWithFrame:CGRectMake(0, 0, _bannerSize.size.width, _bannerSize.size.height)];
+      initWithFrame:CGRectMake(0, 0, updatedBannerSize.width, updatedBannerSize.height)];
+    NSLog(@"[FLUID BANNER TESTING - Adapter] BannerView size *RIGHT* before SDK present called - width(%f) and height(%f)", _bannerView.frame.size.width, _bannerView.frame.size.height);
   [_bannerAd presentOn:_bannerView];
 }
 
