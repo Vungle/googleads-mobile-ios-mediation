@@ -22,11 +22,8 @@
 NSError *_Nonnull GADMAdapterVungleErrorWithCodeAndDescription(GADMAdapterVungleErrorCode code,
                                                                NSString *_Nonnull description);
 
-/// Returns a GADAdSize object that is valid for Vungle SDK.
-GADAdSize GADMAdapterVungleAdSizeForAdSize(GADAdSize adSize);
-
 /// Returns a Liftoff Monetize BannerSize from the provided GADAdSize.
-BannerSize GADMAdapterVungleConvertGADAdSizeToBannerSize(GADAdSize adSize);
+VungleAdSize *_Nonnull GADMAdapterVungleConvertGADAdSizeToBannerSize(GADAdSize adSize);
 
 /// Safely adds |object| to |set| if |object| is not nil.
 void GADMAdapterVungleMutableSetAddObject(NSMutableSet *_Nullable set, NSObject *_Nonnull object);
