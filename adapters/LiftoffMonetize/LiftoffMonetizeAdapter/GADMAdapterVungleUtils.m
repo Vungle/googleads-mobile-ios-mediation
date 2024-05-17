@@ -26,11 +26,11 @@ NSError *_Nonnull GADMAdapterVungleErrorWithCodeAndDescription(GADMAdapterVungle
 }
 
 VungleAdSize *_Nonnull GADMAdapterVungleConvertGADAdSizeToBannerSize(GADAdSize adSize) {
-    if (adSize.size.height == 0) {
-        return [VungleAdSize VungleAdSizeWithWidth:adSize.size.width];
-    }
-    
-    return [VungleAdSize VungleAdSizeFromCGSize:adSize.size];
+  if (adSize.size.height == 0) {
+    return [VungleAdSize VungleAdSizeWithWidth:adSize.size.width];
+  }
+
+  return [VungleAdSize VungleAdSizeFromCGSize:adSize.size];
 }
 
 @implementation GADMAdapterVungleUtils

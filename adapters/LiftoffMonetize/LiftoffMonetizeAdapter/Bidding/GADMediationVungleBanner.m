@@ -21,7 +21,7 @@
 
 @interface GADMediationVungleBanner () <GADMAdapterVungleDelegate,
                                         GADMediationBannerAd,
-VungleBannerViewDelegate>
+                                        VungleBannerViewDelegate>
 @end
 
 @implementation GADMediationVungleBanner {
@@ -38,7 +38,7 @@ VungleBannerViewDelegate>
   GADAdSize _bannerSize;
 
   /// Liftoff Monetize bannerView ad instance.
-    VungleBannerView *_bannerAdView;
+  VungleBannerView *_bannerAdView;
 }
 
 @synthesize desiredPlacement;
@@ -46,7 +46,7 @@ VungleBannerViewDelegate>
 - (void)dealloc {
   _adConfiguration = nil;
   _adLoadCompletionHandler = nil;
-    _bannerAdView = nil;
+  _bannerAdView = nil;
   _delegate = nil;
 }
 
@@ -91,10 +91,10 @@ VungleBannerViewDelegate>
 }
 
 - (void)loadAd {
-    _bannerAdView = [[VungleBannerView alloc]
-                     initWithPlacementId:self.desiredPlacement
-                     vungleAdSize:GADMAdapterVungleConvertGADAdSizeToBannerSize(_bannerSize)];
-    _bannerAdView.delegate = self;
+  _bannerAdView = [[VungleBannerView alloc]
+      initWithPlacementId:self.desiredPlacement
+             vungleAdSize:GADMAdapterVungleConvertGADAdSizeToBannerSize(_bannerSize)];
+  _bannerAdView.delegate = self;
   VungleAdsExtras *extras = [[VungleAdsExtras alloc] init];
   [extras setWithWatermark:[_adConfiguration.watermark base64EncodedStringWithOptions:0]];
   [_bannerAdView setWithExtras:extras];
@@ -104,46 +104,46 @@ VungleBannerViewDelegate>
 #pragma mark - VungleBannerViewDelegate
 
 - (void)bannerAdDidLoad:(VungleBannerView *)bannerView {
-    if (_adLoadCompletionHandler) {
-      _delegate = _adLoadCompletionHandler(self, nil);
-    }
+  if (_adLoadCompletionHandler) {
+    _delegate = _adLoadCompletionHandler(self, nil);
+  }
 }
 
 - (void)bannerAdDidFail:(VungleBannerView *)bannerView withError:(NSError *)withError {
-    if (_delegate != nil) {
-        [_delegate didFailToPresentWithError:withError];
-    }
-    _adLoadCompletionHandler(nil, withError);
+  if (_delegate != nil) {
+    [_delegate didFailToPresentWithError:withError];
+  }
+  _adLoadCompletionHandler(nil, withError);
 }
 
 - (void)bannerAdWillPresent:(VungleBannerView *)bannerView {
-    // Google Mobile Ads SDK doesn't have a matching event.
+  // Google Mobile Ads SDK doesn't have a matching event.
 }
 
 - (void)bannerAdDidPresent:(VungleBannerView *)bannerView {
-    // Google Mobile Ads SDK doesn't have a matching event.
+  // Google Mobile Ads SDK doesn't have a matching event.
 }
 
 - (void)bannerAdWillClose:(VungleBannerView *)bannerView {
-    // This callback is fired when the banner itself is destroyed/removed, not when the user returns
-    // to the app screen after clicking on an ad. Do not map to adViewWillDismissScreen:.
+  // This callback is fired when the banner itself is destroyed/removed, not when the user returns
+  // to the app screen after clicking on an ad. Do not map to adViewWillDismissScreen:.
 }
 
 - (void)bannerAdDidClose:(VungleBannerView *)bannerView {
-    // This callback is fired when the banner itself is destroyed/removed, not when the user returns
-    // to the app screen after clicking on an ad. Do not map to adViewDidDismissScreen:.
+  // This callback is fired when the banner itself is destroyed/removed, not when the user returns
+  // to the app screen after clicking on an ad. Do not map to adViewDidDismissScreen:.
 }
 
 - (void)bannerAdDidTrackImpression:(VungleBannerView *)bannerView {
-    [_delegate reportImpression];
+  [_delegate reportImpression];
 }
 
 - (void)bannerAdDidClick:(VungleBannerView *)bannerView {
-    [_delegate reportClick];
+  [_delegate reportClick];
 }
 
 - (void)bannerAdWillLeaveApplication:(VungleBannerView *)bannerView {
-    // Google Mobile Ads SDK doesn't have a matching event.
+  // Google Mobile Ads SDK doesn't have a matching event.
 }
 
 #pragma mark - GADMAdapterVungleDelegate

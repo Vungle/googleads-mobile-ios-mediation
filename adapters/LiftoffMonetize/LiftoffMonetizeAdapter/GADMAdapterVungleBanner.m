@@ -59,9 +59,9 @@
   }
 
   self.desiredPlacement = [GADMAdapterVungleUtils findPlacement:[strongConnector credentials]];
-    _bannerSize = adSize;
+  _bannerSize = adSize;
   if ([VungleAds isInitialized]) {
-      [self loadAd];
+    [self loadAd];
     return;
   }
 
@@ -70,11 +70,11 @@
 }
 
 - (void)loadAd {
-    _bannerAdView = [[VungleBannerView alloc]
-                     initWithPlacementId:self.desiredPlacement
-                     vungleAdSize:GADMAdapterVungleConvertGADAdSizeToBannerSize(_bannerSize)];
-    
-    _bannerAdView.delegate = self;
+  _bannerAdView = [[VungleBannerView alloc]
+      initWithPlacementId:self.desiredPlacement
+             vungleAdSize:GADMAdapterVungleConvertGADAdSizeToBannerSize(_bannerSize)];
+
+  _bannerAdView.delegate = self;
   // Pass nil for the payload because this is not bidding
   [_bannerAdView load:nil];
 }
@@ -82,41 +82,41 @@
 #pragma mark - VungleBannerViewDelegate
 
 - (void)bannerAdDidLoad:(VungleBannerView *)bannerView {
-    // Google Mobile Ads SDK doesn't have a matching event.
+  // Google Mobile Ads SDK doesn't have a matching event.
 }
 
 - (void)bannerAdDidFail:(VungleBannerView *)bannerView withError:(NSError *)withError {
-    [_connector adapter:_adapter didFailAd:withError];
+  [_connector adapter:_adapter didFailAd:withError];
 }
 
 - (void)bannerAdWillPresent:(VungleBannerView *)bannerView {
-    // Google Mobile Ads SDK doesn't have a matching event.
+  // Google Mobile Ads SDK doesn't have a matching event.
 }
 
 - (void)bannerAdDidPresent:(VungleBannerView *)bannerView {
-    [_connector adapter:_adapter didReceiveAdView:bannerView];
+  [_connector adapter:_adapter didReceiveAdView:bannerView];
 }
 
 - (void)bannerAdWillClose:(VungleBannerView *)bannerView {
-    // This callback is fired when the banner itself is destroyed/removed, not when the user returns
-    // to the app screen after clicking on an ad. Do not map to adViewWillDismissScreen:.
+  // This callback is fired when the banner itself is destroyed/removed, not when the user returns
+  // to the app screen after clicking on an ad. Do not map to adViewWillDismissScreen:.
 }
 
 - (void)bannerAdDidClose:(VungleBannerView *)bannerView {
-    // This callback is fired when the banner itself is destroyed/removed, not when the user returns
-    // to the app screen after clicking on an ad. Do not map to adViewDidDismissScreen:.
+  // This callback is fired when the banner itself is destroyed/removed, not when the user returns
+  // to the app screen after clicking on an ad. Do not map to adViewDidDismissScreen:.
 }
 
 - (void)bannerAdDidTrackImpression:(VungleBannerView *)bannerView {
-    // Google Mobile Ads SDK doesn't have a matching event.
+  // Google Mobile Ads SDK doesn't have a matching event.
 }
 
 - (void)bannerAdDidClick:(VungleBannerView *)bannerView {
-    [_connector adapterDidGetAdClick:_adapter];
+  [_connector adapterDidGetAdClick:_adapter];
 }
 
 - (void)bannerAdWillLeaveApplication:(VungleBannerView *)bannerView {
-    // Google Mobile Ads SDK doesn't have a matching event.
+  // Google Mobile Ads SDK doesn't have a matching event.
 }
 
 #pragma mark - GADMAdapterVungleDelegate delegates
