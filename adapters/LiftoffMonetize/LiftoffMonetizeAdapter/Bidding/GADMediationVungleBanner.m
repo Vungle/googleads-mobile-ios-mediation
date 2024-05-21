@@ -112,6 +112,7 @@
 - (void)bannerAdDidFail:(VungleBannerView *)bannerView withError:(NSError *)withError {
   if (_delegate != nil) {
     [_delegate didFailToPresentWithError:withError];
+    return;
   }
   _adLoadCompletionHandler(nil, withError);
 }
