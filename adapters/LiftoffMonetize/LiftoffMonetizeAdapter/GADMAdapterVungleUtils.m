@@ -25,12 +25,61 @@ NSError *_Nonnull GADMAdapterVungleErrorWithCodeAndDescription(GADMAdapterVungle
   return error;
 }
 
-VungleAdSize *_Nonnull GADMAdapterVungleConvertGADAdSizeToBannerSize(GADAdSize adSize) {
-  if (adSize.size.height == 0) {
-    return [VungleAdSize VungleAdSizeWithWidth:adSize.size.width];
+const CGSize kVNGBannerShortSize = {300, 50};
+GADAdSize GADMAdapterVungleAdSizeForAdSize(GADAdSize adSize, NSString *_Nonnull placementId) {
+    if ([VungleAds isInFeed:placementId]) {
+        return adSize;
+    }
+  if (adSize.size.height >= GADAdSizeMediumRectangle.size.height &&
+      adSize.size.width >= GADAdSizeMediumRectangle.size.width) {
+    return GADAdSizeMediumRectangle;
   }
 
-  return [VungleAdSize VungleAdSizeFromCGSize:adSize.size];
+  // An array of supported ad sizes.
+  GADAdSize shortBannerSize = GADAdSizeFromCGSize(kVNGBannerShortSize);
+  NSArray<NSValue *> *potentials = @[
+    NSValueFromGADAdSize(GADAdSizeBanner), NSValueFromGADAdSize(GADAdSizeLeaderboard),
+    NSValueFromGADAdSize(shortBannerSize)
+  ];
+
+  GADAdSize closestSize = GADClosestValidSizeForAdSizes(adSize, potentials);
+  CGSize size = CGSizeFromGADAdSize(closestSize);
+  if (size.height == GADAdSizeBanner.size.height) {
+    if (size.width < GADAdSizeBanner.size.width) {
+      return shortBannerSize;
+    } else {
+      return GADAdSizeBanner;
+    }
+  } else if (size.height == GADAdSizeLeaderboard.size.height) {
+    return GADAdSizeLeaderboard;
+  }
+  return GADAdSizeInvalid;
+}
+
+VungleAdSize *_Nonnull GADMAdapterVungleConvertGADAdSizeToBannerSize(GADAdSize adSize) {
+    // MREC
+    if (GADAdSizeEqualToSize(adSize, GADAdSizeMediumRectangle)) {
+      return VungleAdSize.VungleAdSizeMREC;
+    }
+    // LeaderBoard
+    if (GADAdSizeEqualToSize(adSize, GADAdSizeLeaderboard)) {
+      return VungleAdSize.VungleAdSizeLeaderboard;
+    }
+    //BannerRegular
+    if (GADAdSizeEqualToSize(adSize, GADAdSizeBanner)) {
+      return VungleAdSize.VungleAdSizeBannerRegular;
+    }
+    //BannerShort
+    GADAdSize shortBannerSize = GADAdSizeFromCGSize(kVNGBannerShortSize);
+    if (GADAdSizeEqualToSize(adSize, shortBannerSize)) {
+      return VungleAdSize.VungleAdSizeBannerShort;
+    }
+    //Custom size
+    return [VungleAdSize VungleAdSizeFromCGSize:adSize.size];
+}
+
+VungleAdSize *_Nonnull GADMAdapterVungleConvertGADAdSizeToVungleAdSize(GADAdSize adSize, NSString *_Nonnull placementId) {
+    return [VungleAdSize VungleValidAdSizeFromCGSizeWithSize:adSize.size placementId:placementId];
 }
 
 @implementation GADMAdapterVungleUtils

@@ -93,7 +93,7 @@
 - (void)loadAd {
   _bannerAdView = [[VungleBannerView alloc]
       initWithPlacementId:self.desiredPlacement
-             vungleAdSize:GADMAdapterVungleConvertGADAdSizeToBannerSize(_bannerSize)];
+             vungleAdSize:GADMAdapterVungleConvertGADAdSizeToVungleAdSize(_bannerSize, self.desiredPlacement)];
   _bannerAdView.delegate = self;
   VungleAdsExtras *extras = [[VungleAdsExtras alloc] init];
   [extras setWithWatermark:[_adConfiguration.watermark base64EncodedStringWithOptions:0]];
