@@ -27,7 +27,7 @@ NSError *_Nonnull GADMAdapterVungleErrorWithCodeAndDescription(GADMAdapterVungle
 
 const CGSize kVNGBannerShortSize = {300, 50};
 GADAdSize GADMAdapterVungleAdSizeForAdSize(GADAdSize adSize, NSString *_Nonnull placementId) {
-    if ([VungleAds isInFeed:placementId]) {
+    if ([VungleAds isInLine:placementId]) {
         return adSize;
     }
   if (adSize.size.height >= GADAdSizeMediumRectangle.size.height &&
