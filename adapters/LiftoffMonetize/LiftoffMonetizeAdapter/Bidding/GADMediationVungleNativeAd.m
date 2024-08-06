@@ -179,10 +179,10 @@
 }
 
 - (CGFloat)mediaContentAspectRatio {
-    if (_nativeAd != nil) {
-        return [_nativeAd getMediaAspectRatio];
-    }
-    return 0.0;
+  if (_nativeAd) {
+    return [_nativeAd getMediaAspectRatio];
+  }
+  return 0.0;
 }
 
 - (void)didRenderInView:(nonnull UIView *)view
