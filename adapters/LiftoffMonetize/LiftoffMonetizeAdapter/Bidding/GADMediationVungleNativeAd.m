@@ -43,11 +43,20 @@
 @synthesize desiredPlacement;
 
 - (void)dealloc {
-  _adConfiguration = nil;
-  _adLoadCompletionHandler = nil;
-  _delegate = nil;
-  _mediaView = nil;
-  _nativeAd = nil;
+    __weak typeof(self) weakSelf = self;
+    [NSThread isMainThread] ? [self cleanupResources] : dispatch_async(dispatch_get_main_queue(), ^{
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        [strongSelf cleanupResources];
+    });
+
+}
+
+- (void)cleanupResources {
+    _adConfiguration = nil;
+    _adLoadCompletionHandler = nil;
+    _delegate = nil;
+    _mediaView = nil;
+    _nativeAd = nil;
 }
 
 - (nonnull instancetype)
