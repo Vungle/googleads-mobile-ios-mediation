@@ -43,12 +43,9 @@
 @synthesize desiredPlacement;
 
 - (void)dealloc {
-    __weak typeof(self) weakSelf = self;
     [NSThread isMainThread] ? [self cleanupResources] : dispatch_async(dispatch_get_main_queue(), ^{
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        [strongSelf cleanupResources];
+        [self cleanupResources];
     });
-
 }
 
 - (void)cleanupResources {
