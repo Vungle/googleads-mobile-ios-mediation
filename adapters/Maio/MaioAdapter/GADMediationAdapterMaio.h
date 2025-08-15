@@ -13,8 +13,19 @@
 // limitations under the License.
 
 #import <Foundation/Foundation.h>
-@import GoogleMobileAds;
+#import <GoogleMobileAds/GoogleMobileAds.h>
 
-@interface GADMediationAdapterMaio : NSObject <GADMediationAdapter>
+typedef NS_ENUM(NSInteger, GADMAdapterMaioErrorCode) {
+  /// maio does not yet have an ad available.
+  GADMAdapterMaioErrorAdNotAvailable = 101,
+  /// Missing server parameters.
+  GADMAdapterMaioErrorInvalidServerParameters = 102,
+  /// The maio adapter does not support the ad format being requested.
+  GADMAdapterMaioErrorAdFormatNotSupported = 103,
+  /// An ad is already loaded for this network configuration.
+  GADMAdapterMaioErrorAdAlreadyLoaded = 104
+};
+
+@interface GADMediationAdapterMaio : NSObject <GADRTBAdapter>
 
 @end

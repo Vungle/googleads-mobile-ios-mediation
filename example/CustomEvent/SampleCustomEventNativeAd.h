@@ -19,8 +19,8 @@
 
 #import <Foundation/Foundation.h>
 #import <GoogleMobileAds/GoogleMobileAds.h>
-#import <SampleAdSDK/SampleAdSDK.h>
 
-@interface SampleCustomEventNativeAd : NSObject<GADCustomEventNativeAd>
-
+@interface SampleCustomEventNativeAd : NSObject
+- (void)loadNativeAdForAdConfiguration:(GADMediationNativeAdConfiguration *)adConfiguration
+                     completionHandler:(GADMediationNativeLoadCompletionHandler)completionHandler;
 @end

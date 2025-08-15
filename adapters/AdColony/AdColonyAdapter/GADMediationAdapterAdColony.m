@@ -22,14 +22,15 @@
 #import "GADMAdapterAdColonyExtras.h"
 #import "GADMAdapterAdColonyHelper.h"
 #import "GADMAdapterAdColonyInitializer.h"
+#import "GADMAdapterAdColonyRTBBannerRenderer.h"
 #import "GADMAdapterAdColonyRTBInterstitialRenderer.h"
 #import "GADMAdapterAdColonyRewardedRenderer.h"
 
 static AdColonyAppOptions *GADMAdapterAdColonyAppOptions;
 
 @implementation GADMediationAdapterAdColony {
-  /// Completion handler for signal generation. Returns either signals or an error object.
-  GADRTBSignalCompletionHandler _signalCompletionHandler;
+  /// AdColony banner ad renderer.
+  GADMAdapterAdColonyRTBBannerRenderer *_bannerRenderer;
 
   /// AdColony interstitial ad renderer.
   GADMAdapterAdColonyRTBInterstitialRenderer *_interstitialRenderer;
@@ -55,13 +56,13 @@ static AdColonyAppOptions *GADMAdapterAdColonyAppOptions;
     NSString *zoneID = GADMAdapterAdColonyZoneIDForSettings(cred.settings);
     GADMAdapterAdColonyMutableSetAddObject(zoneIDs, zoneID);
 
-    NSString *appID = cred.settings[kGADMAdapterAdColonyAppIDkey];
+    NSString *appID = cred.settings[GADMAdapterAdColonyAppIDkey];
     GADMAdapterAdColonyMutableSetAddObject(appIDs, appID);
   }
 
   if (appIDs.count < 1 || zoneIDs.count < 1) {
     NSError *error = GADMAdapterAdColonyErrorWithCodeAndDescription(
-        kGADErrorInvalidRequest,
+        GADMAdapterAdColonyErrorMissingServerParameters,
         @"AdColony mediation configurations did not contain a valid app ID or zone ID.");
     completionHandler(error);
     return;
@@ -81,22 +82,6 @@ static AdColonyAppOptions *GADMAdapterAdColonyAppOptions;
                             zones:[zoneIDs allObjects]
                           options:GADMAdapterAdColonyAppOptions
                          callback:^(NSError *error) {
-                           // After configuration completion, register custom message listener
-                           // to get bid values
-                           [AdColony
-                               sendCustomMessageOfType:@"register_handler"
-                                           withContent:@"bid"
-                                                 reply:^(id _Nullable reply) {
-                                                   if (![reply isKindOfClass:[NSString class]]) {
-                                                     return;
-                                                   }
-
-                                                   NSString *zoneID =
-                                                       GADMAdapterAdColonyZoneIDForReply(reply);
-                                                   GADMAdapterAdColonyMutableDictionarySetObjectForKey(
-                                                       GADMediationAdapterAdColony.bidValues,
-                                                       zoneID, reply);
-                                                 }];
                            // Tell the Google Mobile Ads SDK that AdColony is initialized and
                            // is ready to service requests.
                            completionHandler(error);
@@ -120,8 +105,8 @@ static AdColonyAppOptions *GADMAdapterAdColonyAppOptions;
   return [GADMAdapterAdColonyExtras class];
 }
 
-+ (GADVersionNumber)version {
-  NSString *versionString = kGADMAdapterAdColonyVersionString;
++ (GADVersionNumber)adapterVersion {
+  NSString *versionString = GADMAdapterAdColonyVersionString;
   NSArray *versionComponents = [versionString componentsSeparatedByString:@"."];
 
   GADVersionNumber version = {0};
@@ -134,42 +119,9 @@ static AdColonyAppOptions *GADMAdapterAdColonyAppOptions;
   return version;
 }
 
-+ (NSMutableDictionary *)bidValues {
-  static NSMutableDictionary *valuesDict = nil;
-  if (valuesDict == nil) {
-    valuesDict = [[NSMutableDictionary alloc] init];
-  }
-  return valuesDict;
-}
-
 - (void)collectSignalsForRequestParameters:(GADRTBRequestParameters *)params
                          completionHandler:(GADRTBSignalCompletionHandler)completionHandler {
-  // Keep handler, in practice this call may be asynchronous.
-  __block atomic_flag completionHandlerCalled = ATOMIC_FLAG_INIT;
-  __block GADRTBSignalCompletionHandler originalCompletionHandler = [completionHandler copy];
-  _signalCompletionHandler = ^void(NSString *_Nullable signals, NSError *_Nullable error) {
-    if (atomic_flag_test_and_set(&completionHandlerCalled)) {
-      return;
-    }
-
-    if (originalCompletionHandler) {
-      originalCompletionHandler(signals, error);
-    }
-    originalCompletionHandler = nil;
-  };
-
-  NSString *signals = nil;
-
-  // Get Zone Id for which signals are requested
-  NSString *zoneId;
-  if (params.configuration.credentials.count > 0) {
-    zoneId = params.configuration.credentials[0].settings[kGADMAdapterAdColonyZoneIDOpenBiddingKey];
-  }
-  if (zoneId.length) {
-    // Take out saved signals for above zone Id
-    signals = [self getSignalsForZone:zoneId];
-  }
-  _signalCompletionHandler(signals, nil);
+  [AdColony collectSignals:completionHandler];
 }
 
 - (void)loadRewardedAdForAdConfiguration:(GADMediationRewardedAdConfiguration *)adConfiguration
@@ -189,36 +141,9 @@ static AdColonyAppOptions *GADMAdapterAdColonyAppOptions;
                                      completionHandler:completionHandler];
 }
 
-// Build JSON with signals values
-- (NSString *)getSignalsForZone:(NSString *)zoneId {
-  NSString *signals = nil;
-  NSMutableDictionary<NSString *, NSString *> *values = [[NSMutableDictionary alloc] init];
-
-  // Add alternative ad Id if it's there
-  NSString *adcID = [self getAlternateAdId];
-  if (adcID.length) {
-    values[kGADMAdapterAdColonyAltAdIdKey] = adcID;
-  }
-
-  // Add bid reply for above zone Id if it's there
-  NSString *bidReply = GADMediationAdapterAdColony.bidValues[zoneId];
-  if (bidReply.length) {
-    values[kGADMAdapterAdColonyBidReplyKey] = bidReply;
-  }
-
-  if (values.count) {
-    // get JSON string from dictionary
-    signals = [GADMAdapterAdColonyHelper getJsonStringFromDictionary:values];
-  }
-
-  return signals;
+- (void)loadBannerForAdConfiguration:(GADMediationBannerAdConfiguration *)adConfiguration
+                   completionHandler:(GADMediationBannerLoadCompletionHandler)completionHandler {
+  _bannerRenderer = [[GADMAdapterAdColonyRTBBannerRenderer alloc] init];
+  [_bannerRenderer renderBannerForAdConfig:adConfiguration completionHandler:completionHandler];
 }
-
-// Get Alternative Ad Id if LAT is enabled
-- (NSString *)getAlternateAdId {
-  NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-  NSString *adcID = [userDefaults stringForKey:kGADMAdapterAdColonyAltAdIdKey];
-  return adcID;
-}
-
 @end

@@ -20,27 +20,34 @@ import Foundation
 import GoogleMobileAds
 import SampleAdSDK
 
-/// Constant for Sample Ad Network custom event error domain.
-private let customEventErrorDomain: String = "com.google.CustomEvent"
+class SampleCustomEventInterstitialSwift: NSObject, GADMediationInterstitialAd {
 
-class SampleCustomEventInterstitialSwift: NSObject, GADCustomEventInterstitial {
   /// The Sample Ad Network interstitial.
   var interstitial: SampleInterstitial?
-  var delegate: GADCustomEventInterstitialDelegate?
 
-  func requestAd(withParameter serverParameter: String?,
-                 label serverLabel: String?,
-                 request: GADCustomEventRequest) {
-    interstitial = SampleInterstitial.init(adUnitID: serverParameter)
+  /// The ad event delegate to forward ad rendering events to the Google Mobile Ads SDK.
+  var delegate: GADMediationInterstitialAdEventDelegate?
+
+  var completionHandler: GADMediationInterstitialLoadCompletionHandler?
+
+  required override init() {
+    super.init()
+  }
+
+  func loadInterstitial(
+    for adConfiguration: GADMediationInterstitialAdConfiguration,
+    completionHandler: @escaping GADMediationInterstitialLoadCompletionHandler
+  ) {
+    interstitial = SampleInterstitial.init(
+      adUnitID: adConfiguration.credentials.settings["parameter"] as? String)
     interstitial?.delegate = self
     let adRequest = SampleAdRequest()
-    adRequest.testMode = request.isTesting
-    adRequest.keywords = request.userKeywords as? [String]
+    adRequest.testMode = adConfiguration.isTestRequest
+    self.completionHandler = completionHandler
     interstitial?.fetchAd(adRequest)
   }
 
-  /// Present the interstitial ad as a modal view using the provided view controller.
-  func present(fromRootViewController rootViewController: UIViewController) {
+  func present(from viewController: UIViewController) {
     if let interstitial = interstitial, interstitial.isInterstitialLoaded {
       interstitial.show()
     }
@@ -50,28 +57,36 @@ class SampleCustomEventInterstitialSwift: NSObject, GADCustomEventInterstitial {
 extension SampleCustomEventInterstitialSwift: SampleInterstitialAdDelegate {
 
   func interstitialDidLoad(_ interstitial: SampleInterstitial) {
-    delegate?.customEventInterstitialDidReceiveAd(self)
+    if let handler = completionHandler {
+      delegate = handler(self, nil)
+    }
   }
 
-  func interstitial(_ interstitial: SampleInterstitial, didFailToLoadAdWith errorCode: SampleErrorCode) {
-    let error = NSError(domain: customEventErrorDomain, code: errorCode.rawValue, userInfo: nil)
-    delegate?.customEventInterstitial(self, didFailAd: error)
+  func interstitial(
+    _ interstitial: SampleInterstitial, didFailToLoadAdWith errorCode: SampleErrorCode
+  ) {
+    let error = SampleCustomEventUtilsSwift.SampleCustomEventErrorWithCodeAndDescription(
+      code: SampleCustomEventErrorCodeSwift.SampleCustomEventErrorAdLoadFailureCallback,
+      description: "Sample SDK returned an ad load failure callback with error code: \(errorCode)")
+    if let handler = completionHandler {
+      delegate = handler(nil, error)
+    }
   }
 
   func interstitialWillPresentScreen(_ interstitial: SampleInterstitial) {
-    delegate?.customEventInterstitialWillPresent(self)
+    delegate?.willPresentFullScreenView()
+    delegate?.reportImpression()
   }
 
   func interstitialWillDismissScreen(_ interstitial: SampleInterstitial) {
-    delegate?.customEventInterstitialWillDismiss(self)
+    delegate?.willDismissFullScreenView()
   }
 
   func interstitialDidDismissScreen(_ interstitial: SampleInterstitial) {
-    delegate?.customEventInterstitialDidDismiss(self)
+    delegate?.didDismissFullScreenView()
   }
 
   func interstitialWillLeaveApplication(_ interstitial: SampleInterstitial) {
-    delegate?.customEventInterstitialWasClicked(self)
-    delegate?.customEventInterstitialWillLeaveApplication(self)
+    delegate?.reportClick()
   }
 }

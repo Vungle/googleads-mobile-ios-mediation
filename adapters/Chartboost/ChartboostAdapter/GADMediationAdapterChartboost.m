@@ -13,36 +13,51 @@
 // limitations under the License.
 
 #import "GADMediationAdapterChartboost.h"
+#if __has_include(<Chartboost/Chartboost.h>)
 #import <Chartboost/Chartboost.h>
+#else
+#import "Chartboost.h"
+#endif
 #import "GADMAdapterChartboostConstants.h"
-#import "GADMAdapterChartboostSingleton.h"
+#import "GADMAdapterChartboostRewardedAd.h"
 #import "GADMAdapterChartboostUtils.h"
+#import "GADMChartboostError.h"
 #import "GADMChartboostExtras.h"
-#import "GADMRewardedAdChartboost.h"
+#import "GADMediationAdapterChartboost.h"
 
 @implementation GADMediationAdapterChartboost {
   /// Chartboost rewarded ad wrapper.
-  GADMRewardedAdChartboost *_rewardedAd;
+  GADMAdapterChartboostRewardedAd *_rewardedAd;
 }
 
 + (void)setUpWithConfiguration:(GADMediationServerConfiguration *)configuration
              completionHandler:(GADMediationAdapterSetUpCompletionBlock)completionHandler {
+  if (SYSTEM_VERSION_LESS_THAN(GADMAdapterChartboostMinimumOSVersion)) {
+    NSString *logMessage = [NSString
+        stringWithFormat:
+            @"Chartboost minimum supported OS version is iOS %@. Requested action is a no-op.",
+            GADMAdapterChartboostMinimumOSVersion];
+    NSError *error = GADMAdapterChartboostErrorWithCodeAndDescription(
+        GADMAdapterChartboostErrorMinimumOSVersion, logMessage);
+    completionHandler(error);
+    return;
+  }
+
   NSMutableDictionary *credentials = [[NSMutableDictionary alloc] init];
 
   for (GADMediationCredentials *cred in configuration.credentials) {
-    NSString *appID = cred.settings[kGADMAdapterChartboostAppID];
-    NSString *appSignature = cred.settings[kGADMAdapterChartboostAppSignature];
-    GADMAdapterChartboostMutableDictionarySetObjectForKey(credentials, appID, appSignature);
+    NSString *appID = cred.settings[GADMAdapterChartboostAppID];
+    NSString *appSignature = cred.settings[GADMAdapterChartboostAppSignature];
+
+    if (appID.length && appSignature.length) {
+      GADMAdapterChartboostMutableDictionarySetObjectForKey(credentials, appID, appSignature);
+    }
   }
 
   if (!credentials.count) {
-    NSError *error = [NSError
-        errorWithDomain:kGADMAdapterChartboostErrorDomain
-                   code:kGADErrorMediationDataError
-               userInfo:@{
-                 NSLocalizedDescriptionKey : @"Chartboost mediation configurations did not contain "
-                                             @"a valid appID and app signature."
-               }];
+    NSError *error = GADMAdapterChartboostErrorWithCodeAndDescription(
+        GADMAdapterChartboostErrorInvalidServerParameters,
+        @"Chartboost mediation configurations did not contain a valid appID and app signature.");
     completionHandler(error);
     return;
   }
@@ -56,12 +71,17 @@
     NSLog(@"Initializing Chartboost SDK with the app ID: %@ and app signature: %@", appID,
           appSignature);
   }
-  GADMAdapterChartboostSingleton *sharedInstance = GADMAdapterChartboostSingleton.sharedInstance;
-  [sharedInstance startWithAppId:appID
-                    appSignature:appSignature
-               completionHandler:^(NSError *error) {
-                 completionHandler(error);
-               }];
+  [Chartboost startWithAppId:appID
+                appSignature:appSignature
+                  completion:^(BOOL success) {
+                    NSError *error = nil;
+                    if (!success) {
+                      error = GADMAdapterChartboostErrorWithCodeAndDescription(
+                          GADMAdapterChartboostErrorInitializationFailure,
+                          @"Chartboost SDK initialization failed.");
+                    }
+                    completionHandler(error);
+                  }];
 }
 
 + (GADVersionNumber)adSDKVersion {
@@ -81,8 +101,8 @@
   return [GADMChartboostExtras class];
 }
 
-+ (GADVersionNumber)version {
-  NSString *versionString = kGADMAdapterChartboostVersion;
++ (GADVersionNumber)adapterVersion {
+  NSString *versionString = GADMAdapterChartboostVersion;
   NSArray *versionComponents = [versionString componentsSeparatedByString:@"."];
 
   GADVersionNumber version = {0};
@@ -98,9 +118,9 @@
 - (void)loadRewardedAdForAdConfiguration:(GADMediationRewardedAdConfiguration *)adConfiguration
                        completionHandler:
                            (GADMediationRewardedLoadCompletionHandler)completionHandler {
-  _rewardedAd = [[GADMRewardedAdChartboost alloc] init];
-  [_rewardedAd loadRewardedAdForAdConfiguration:adConfiguration
-                              completionHandler:completionHandler];
+  _rewardedAd = [[GADMAdapterChartboostRewardedAd alloc] initWithAdConfiguration:adConfiguration
+                                                               completionHandler:completionHandler];
+  [_rewardedAd loadRewardedAd];
 }
 
 @end

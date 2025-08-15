@@ -38,18 +38,14 @@
   NSMutableSet *sdkKeys = [[NSMutableSet alloc] init];
 
   for (GADMediationCredentials *cred in configuration.credentials) {
-    NSString *sdkKeyFromSettings = cred.settings[kGADMAdapterTapjoySdkKey];
+    NSString *sdkKeyFromSettings = cred.settings[GADMAdapterTapjoySdkKey];
     GADMAdapterTapjoyMutableSetAddObject(sdkKeys, sdkKeyFromSettings);
   }
 
   if (!sdkKeys.count) {
-    NSError *error =
-        [NSError errorWithDomain:kGADMAdapterTapjoyErrorDomain
-                            code:kGADErrorMediationDataError
-                        userInfo:@{
-                          NSLocalizedDescriptionKey :
-                              @"Tapjoy mediation configurations did not contain a valid SDK Key."
-                        }];
+    NSError *error = GADMAdapterTapjoyErrorWithCodeAndDescription(
+        GADMAdapterTapjoyErrorInvalidServerParameters,
+        @"Tapjoy mediation configurations did not contain a valid SDK Key.");
     completionHandler(error);
     return;
   }
@@ -62,9 +58,8 @@
     NSLog(@"Initializing Tapjoy SDK with the sdk key: %@", sdkKey);
   }
 
-  NSMutableDictionary *connectOptions = [[NSMutableDictionary alloc] init];
   [[GADMAdapterTapjoySingleton sharedInstance] initializeTapjoySDKWithSDKKey:sdkKey
-                                                                     options:connectOptions
+                                                                     options:nil
                                                            completionHandler:^(NSError *error) {
                                                              completionHandler(error);
                                                            }];
@@ -72,13 +67,13 @@
 
 + (GADVersionNumber)adSDKVersion {
   NSString *versionString = [Tapjoy getVersion];
-  NSArray *versionComponents = [versionString componentsSeparatedByString:@"."];
+  NSArray<NSString *> *versionComponents = [versionString componentsSeparatedByString:@"."];
 
   GADVersionNumber version = {0};
   if (versionComponents.count == 3) {
-    version.majorVersion = [versionComponents[0] integerValue];
-    version.minorVersion = [versionComponents[1] integerValue];
-    version.patchVersion = [versionComponents[2] integerValue];
+    version.majorVersion = versionComponents[0].integerValue;
+    version.minorVersion = versionComponents[1].integerValue;
+    version.patchVersion = versionComponents[2].integerValue;
   }
   return version;
 }
@@ -87,15 +82,16 @@
   return [GADMTapjoyExtras class];
 }
 
-+ (GADVersionNumber)version {
-  NSArray *versionComponents = [kGADMAdapterTapjoyVersion componentsSeparatedByString:@"."];
++ (GADVersionNumber)adapterVersion {
+  NSArray<NSString *> *versionComponents =
+      [GADMAdapterTapjoyVersion componentsSeparatedByString:@"."];
 
   GADVersionNumber version = {0};
   if (versionComponents.count >= 4) {
-    version.majorVersion = [versionComponents[0] integerValue];
-    version.minorVersion = [versionComponents[1] integerValue];
+    version.majorVersion = versionComponents[0].integerValue;
+    version.minorVersion = versionComponents[1].integerValue;
     version.patchVersion =
-        [versionComponents[2] integerValue] * 100 + [versionComponents[3] integerValue];
+        versionComponents[2].integerValue * 100 + versionComponents[3].integerValue;
   }
   return version;
 }

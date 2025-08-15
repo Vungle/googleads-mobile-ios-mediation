@@ -1,4 +1,4 @@
-// Copyright 2019 Google Inc.
+// Copyright 2020 Google LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,15 +13,63 @@
 // limitations under the License.
 
 #import "GADMAdapterUnityUtils.h"
+#import "GADMAdapterUnityConstants.h"
 
-void GADMAdapterUnityMutableSetAddObject(NSMutableSet *_Nullable set, NSObject *_Nonnull object) {
+void GADMAdapterUnityConfigureMediationService(void) {
+  UADSMediationMetaData *mediationMetaData = [[UADSMediationMetaData alloc] init];
+  [mediationMetaData setName:GADMAdapterUnityMediationNetworkName];
+  [mediationMetaData setVersion:GADMAdapterUnityVersion];
+  [mediationMetaData set:@"adapter_version" value:[UnityAds getVersion]];
+  [mediationMetaData commit];
+}
+
+void GADMAdapterUnityMutableArrayAddObject(NSMutableArray *_Nullable array,
+                                           NSObject *_Nonnull object) {
   if (object) {
-    [set addObject:object]; // Allow pattern.
+    [array addObject:object];  // Allow pattern.
   }
 }
 
-void GADMAdapterUnityMapTableRemoveObjectForKey(NSMapTable *_Nullable mapTable, id _Nullable key) {
-  if (key) {
-    [mapTable removeObjectForKey:key]; // Allow pattern.
+void GADMAdapterUnityMutableSetAddObject(NSMutableSet *_Nullable set, NSObject *_Nonnull object) {
+  if (object) {
+    [set addObject:object];  // Allow pattern.
   }
+}
+
+NSError *_Nonnull GADMAdapterUnityErrorWithCodeAndDescription(GADMAdapterUnityErrorCode code,
+                                                              NSString *_Nonnull description) {
+  NSDictionary *userInfo =
+      @{NSLocalizedDescriptionKey : description, NSLocalizedFailureReasonErrorKey : description};
+  NSError *error = [NSError errorWithDomain:GADMAdapterUnityErrorDomain
+                                       code:code
+                                   userInfo:userInfo];
+  return error;
+}
+
+NSError *_Nonnull GADMAdapterUnitySDKErrorWithUnityAdsShowErrorAndMessage(
+    UnityAdsShowError errorCode, NSString *_Nonnull message) {
+  NSDictionary *userInfo =
+      @{NSLocalizedDescriptionKey : message, NSLocalizedFailureReasonErrorKey : message};
+  NSError *error = [NSError errorWithDomain:GADMAdapterUnitySDKErrorDomain
+                                       code:errorCode
+                                   userInfo:userInfo];
+  return error;
+}
+
+GADAdSize supportedAdSizeFromRequestedSize(GADAdSize gadAdSize) {
+  NSArray *potentials =
+      @[ NSValueFromGADAdSize(GADAdSizeBanner), NSValueFromGADAdSize(GADAdSizeLeaderboard) ];
+  return GADClosestValidSizeForAdSizes(gadAdSize, potentials);
+}
+
+GADVersionNumber extractVersionFromString(NSString *_Nonnull string) {
+  GADVersionNumber version = {0};
+  NSArray<NSString *> *components = [string componentsSeparatedByString:@"."];
+  if (components.count >= 3) {
+    version.majorVersion = components[0].integerValue;
+    version.minorVersion = components[1].integerValue;
+    NSInteger patch = components[2].integerValue;
+    version.patchVersion = components.count == 4 ? patch * 100 + components[3].integerValue : patch;
+  }
+  return version;
 }

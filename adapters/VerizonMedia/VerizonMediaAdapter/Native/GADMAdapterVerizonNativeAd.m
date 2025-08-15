@@ -40,8 +40,8 @@
     _connector = connector;
     _adapter = adapter;
     NSDictionary<NSString *, id> *credentials = [connector credentials];
-    _placementID = credentials[kGADMAdapterVerizonMediaPosition];
-    NSString *siteID = credentials[kGADMAdapterVerizonMediaDCN];
+    _placementID = credentials[GADMAdapterVerizonMediaPosition];
+    NSString *siteID = credentials[GADMAdapterVerizonMediaDCN];
     GADMAdapterVerizonInitializeVASAdsWithSiteID(siteID);
   }
 
@@ -54,7 +54,7 @@
     return;
   }
   _nativeAdFactory = [[VASNativeAdFactory alloc] initWithPlacementId:_placementID
-                                                             adTypes:@[ @"inline" ]
+                                                             adTypes:@[ @"100", @"simpleImage" ]
                                                               vasAds:VASAds.sharedInstance
                                                             delegate:self];
   [_nativeAdFactory load:self];
@@ -63,14 +63,28 @@
 #pragma mark - common
 
 - (BOOL)prepareAdapterForAdRequest {
-  if (!_placementID || ![VASAds.sharedInstance isInitialized]) {
-    NSError *error = [NSError
-        errorWithDomain:kGADErrorDomain
-                   code:kGADErrorMediationAdapterError
-               userInfo:@{
-                 NSLocalizedDescriptionKey : @"Verizon adapter was not intialized properly."
-               }];
-    [_connector adapter:_adapter didFailAd:error];
+  id<GADMAdNetworkConnector> strongConnector = _connector;
+
+  if (!strongConnector) {
+    NSLog(@"Verizon Adapter Error: No GADMAdNetworkConnector found.");
+    return NO;
+  }
+
+  NSDictionary<NSString *, id> *credentials = [strongConnector credentials];
+  NSString *siteID = credentials[GADMAdapterVerizonMediaDCN];
+
+  BOOL isInitialized = GADMAdapterVerizonInitializeVASAdsWithSiteID(siteID);
+  if (!isInitialized) {
+    NSError *error = GADMAdapterVerizonErrorWithCodeAndDescription(
+        GADMAdapterVerizonErrorInitialization, @"Verizon SDK failed to initialize.");
+    [strongConnector adapter:(id<GADMAdNetworkAdapter>)self didFailAd:error];
+    return NO;
+  }
+
+  if (!_placementID) {
+    NSError *error = GADMAdapterVerizonErrorWithCodeAndDescription(
+        GADMAdapterVerizonErrorInvalidServerParameters, @"Placement ID cannot be nil.");
+    [strongConnector adapter:(id<GADMAdNetworkAdapter>)self didFailAd:error];
     return NO;
   }
 
@@ -96,7 +110,7 @@
   VASRequestMetadataBuilder *builder = [[VASRequestMetadataBuilder alloc] init];
 
   // Mediator
-  builder.mediator = [NSString stringWithFormat:@"AdMobVAS-%@", kGADMAdapterVerizonMediaVersion];
+  builder.mediator = [NSString stringWithFormat:@"AdMobVAS-%@", GADMAdapterVerizonMediaVersion];
 
   // Keywords.
   id<GADMAdNetworkConnector> strongConnector = _connector;
@@ -108,7 +122,9 @@
 }
 
 - (void)setCoppaFromConnector {
-  VASAds.sharedInstance.COPPA = [_connector childDirectedTreatment];
+  VASDataPrivacyBuilder *builder = [[VASDataPrivacyBuilder alloc] initWithDataPrivacy:VASAds.sharedInstance.dataPrivacy];
+  builder.coppa.applies =  [[_connector childDirectedTreatment] boolValue];
+  VASAds.sharedInstance.dataPrivacy = [builder build];
 }
 
 - (NSString *)stringForComponent:(NSString *)componentId {
@@ -121,7 +137,7 @@
 
 - (GADNativeAdImage *)imageForComponent:(NSString *)componentId {
   GADNativeAdImage *GADImage;
-  id<VASComponent> component = [_nativeAd.rootBundle component:componentId];
+  id<VASComponent> component = [_nativeAd component:componentId];
   if ([component conformsToProtocol:@protocol(VASNativeImageComponent)]) {
     UIImageView *imageView = (UIImageView *)((id<VASNativeImageComponent>)component).view;
     if ([imageView isKindOfClass:[UIImageView class]]) {
@@ -208,7 +224,7 @@
   [_nativeAd fireImpression];
 }
 
-- (void)didRecordClickOnAssetWithName:(GADUnifiedNativeAssetIdentifier)assetName
+- (void)didRecordClickOnAssetWithName:(GADNativeAssetIdentifier)assetName
                                  view:(UIView *)view
                        viewController:(UIViewController *)viewController {
   [_nativeAd invokeDefaultAction];
@@ -231,7 +247,8 @@
 #pragma mark - VASNativeAd Delegate
 
 - (void)nativeAdDidClose:(nonnull VASNativeAd *)nativeAd {
-  // Admob adapter has no similar event, ignore it.
+  // The `onAdClosed()` has a different meaning than Google's `onAdClosed()` and is therefore not
+  // mapped.
 }
 
 - (void)nativeAdDidFail:(nonnull VASNativeAd *)nativeAd
@@ -241,8 +258,24 @@
 }
 
 - (void)nativeAdDidLeaveApplication:(nonnull VASNativeAd *)nativeAd {
+    // Do nothing.
+}
+
+- (void)nativeAd:(nonnull VASNativeAd *)nativeAd
+           event:(nonnull NSString *)eventId
+          source:(nonnull NSString *)source
+       arguments:(nonnull NSDictionary<NSString *, id> *)arguments {
+  // Do nothing.
+}
+
+- (nullable UIViewController *)nativeAdPresentingViewController {
+  return [_connector viewControllerForPresentingModalView];
+}
+
+- (void)nativeAdClicked:(nonnull VASNativeAd *)nativeAd
+          withComponent:(nonnull id<VASComponent>)component {
   dispatch_async(dispatch_get_main_queue(), ^{
-    [self->_connector adapterWillLeaveApplication:self->_adapter];
+    [self->_connector adapterDidGetAdClick:self->_adapter];
   });
 }
 
@@ -261,35 +294,6 @@
     self->_nativeAd = nativeAd;
     [self->_connector adapter:self->_adapter didReceiveMediatedUnifiedNativeAd:self];
   });
-}
-
-- (void)nativeAdEvent:(nonnull VASNativeAd *)nativeAd
-               source:(nonnull NSString *)source
-              eventId:(nonnull NSString *)eventId
-            arguments:(nonnull NSDictionary<NSString *, id> *)arguments {
-  // Do nothing.
-}
-
-- (nullable UIViewController *)nativeAdPresentingViewController {
-  return [_connector viewControllerForPresentingModalView];
-}
-
-- (void)nativeAdClicked:(nonnull VASNativeAd *)nativeAd
-          withComponent:(nonnull id<VASComponent>)component {
-  dispatch_async(dispatch_get_main_queue(), ^{
-    [self->_connector adapterDidGetAdClick:self->_adapter];
-  });
-}
-
-- (void)nativeAdFactory:(nonnull VASNativeAdFactory *)adFactory
-    cacheLoadedNumRequested:(NSUInteger)numRequested
-                numReceived:(NSUInteger)numReceived {
-  // Do nothing.
-}
-
-- (void)nativeAdFactory:(nonnull VASNativeAdFactory *)adFactory
-    cacheUpdatedWithCacheSize:(NSUInteger)cacheSize {
-  // Do nothing.
 }
 
 @end

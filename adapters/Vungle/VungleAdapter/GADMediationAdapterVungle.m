@@ -14,14 +14,22 @@
 
 #import "GADMediationAdapterVungle.h"
 #import "GADMAdapterVungleConstants.h"
-#import "GADMAdapterVungleRewardedAd.h"
+#import "GADMAdapterVungleRewardBasedVideoAd.h"
 #import "GADMAdapterVungleRouter.h"
 #import "GADMAdapterVungleUtils.h"
+#import "GADMediationVungleInterstitial.h"
+#import "GADMediationVungleRewardedAd.h"
 #import "VungleAdNetworkExtras.h"
 
 @implementation GADMediationAdapterVungle {
   /// Vungle rewarded ad wrapper.
-  GADMAdapterVungleRewardedAd *_rewardedAd;
+  GADMediationVungleRewardedAd *_rewardedAd;
+
+  /// Vungle waterfall mediation rewarded ad wrapper.
+  GADMAdapterVungleRewardBasedVideoAd *_waterfallRewardedAd;
+
+  /// Vungle interstitial ad wrapper.
+  GADMediationVungleInterstitial *_interstitialAd;
 }
 
 + (void)setUpWithConfiguration:(nonnull GADMediationServerConfiguration *)configuration
@@ -29,13 +37,13 @@
   NSMutableSet *applicationIDs = [[NSMutableSet alloc] init];
 
   for (GADMediationCredentials *cred in configuration.credentials) {
-    NSString *appID = cred.settings[kGADMAdapterVungleApplicationID];
+    NSString *appID = cred.settings[GADMAdapterVungleApplicationID];
     GADMAdapterVungleMutableSetAddObject(applicationIDs, appID);
   }
 
   if (!applicationIDs.count) {
     NSError *error = GADMAdapterVungleErrorWithCodeAndDescription(
-        kGADErrorMediationDataError,
+        GADMAdapterVungleErrorInvalidServerParameters,
         @"Vungle mediation configurations did not contain a valid application ID.");
     completionHandler(error);
     return;
@@ -49,7 +57,7 @@
     NSLog(@"Configuring Vungle SDK with the application ID %@.", applicationID);
   }
 
-  [[GADMAdapterVungleRouter sharedInstance] initWithAppId:applicationID delegate:nil];
+  [GADMAdapterVungleRouter.sharedInstance initWithAppId:applicationID delegate:nil];
   completionHandler(nil);
 }
 
@@ -70,8 +78,8 @@
   return [VungleAdNetworkExtras class];
 }
 
-+ (GADVersionNumber)version {
-  NSString *versionString = kGADMAdapterVungleVersion;
++ (GADVersionNumber)adapterVersion {
+  NSString *versionString = GADMAdapterVungleVersion;
   NSArray *versionComponents = [versionString componentsSeparatedByString:@"."];
 
   GADVersionNumber version = {0};
@@ -89,9 +97,34 @@
             (nonnull GADMediationRewardedAdConfiguration *)adConfiguration
                        completionHandler:
                            (nonnull GADMediationRewardedLoadCompletionHandler)completionHandler {
-  _rewardedAd = [[GADMAdapterVungleRewardedAd alloc] initWithAdConfiguration:adConfiguration
+  if (!adConfiguration.bidResponse) {
+    _waterfallRewardedAd =
+        [[GADMAdapterVungleRewardBasedVideoAd alloc] initWithAdConfiguration:adConfiguration
                                                            completionHandler:completionHandler];
+    [_waterfallRewardedAd requestRewardedAd];
+    return;
+  }
+  _rewardedAd = [[GADMediationVungleRewardedAd alloc] initWithAdConfiguration:adConfiguration
+                                                            completionHandler:completionHandler];
   [_rewardedAd requestRewardedAd];
+}
+
+- (void)loadInterstitialForAdConfiguration:
+            (nonnull GADMediationInterstitialAdConfiguration *)adConfiguration
+                         completionHandler:(nonnull GADMediationInterstitialLoadCompletionHandler)
+                                               completionHandler {
+  _interstitialAd =
+      [[GADMediationVungleInterstitial alloc] initWithAdConfiguration:adConfiguration
+                                                    completionHandler:completionHandler];
+  [_interstitialAd requestInterstitialAd];
+}
+
+#pragma mark GADRTBAdapter implementation
+
+- (void)collectSignalsForRequestParameters:(nonnull GADRTBRequestParameters *)params
+                         completionHandler:
+                             (nonnull GADRTBSignalCompletionHandler)completionHandler {
+  completionHandler([GADMAdapterVungleRouter.sharedInstance getSuperToken], nil);
 }
 
 @end

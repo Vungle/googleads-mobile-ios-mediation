@@ -1,4 +1,4 @@
-// Copyright 2016 Google Inc.
+// Copyright 2020 Google LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,49 +13,39 @@
 // limitations under the License.
 
 #import "GADMAdapterUnity.h"
+#import <UnityAds/UnityAds.h>
 
-#import "GADMAdapterUnityConstants.h"
-#import "GADMAdapterUnitySingleton.h"
+#import "GADMAdapterUnityUtils.h"
+#import "GADMUnityBannerNetworkAdapterProxy.h"
+#import "GADMUnityInterstitialNetworkAdapterProxy.h"
 #import "GADMediationAdapterUnity.h"
-#import "GADUnityError.h"
-#import "GADMAdapterUnityBannerAd.h"
+#import "NSErrorUnity.h"
 
-@interface GADMAdapterUnity () {
-  /// Connector from Google Mobile Ads SDK to receive ad configurations.
-  __weak id<GADMAdNetworkConnector> _networkConnector;
-
-  /// Game ID of Unity Ads network.
-  NSString *_gameID;
-
-  /// Placement ID of Unity Ads network.
-  NSString *_placementID;
-
-  /// Unity Ads Banner wrapper
-  GADMAdapterUnityBannerAd *_bannerAd;
-
-  /// YES if the adapter is loading.
-  BOOL _isLoading;
-}
-
+@interface GADMAdapterUnity ()
+@property(nonatomic, weak) id<GADMAdNetworkConnector> connector;
+@property(nonatomic, strong) UADSBannerView *bannerAd;
+@property(nonatomic, strong) GADMUnityBannerNetworkAdapterProxy *bannerAdDelegateProxy;
 @end
 
 @implementation GADMAdapterUnity
+
+#pragma mark GADMAdNetworkAdapter
 
 + (nonnull Class<GADMediationAdapter>)mainAdapterClass {
   return [GADMediationAdapterUnity class];
 }
 
 + (NSString *)adapterVersion {
-  return kGADMAdapterUnityVersion;
+  return GADMAdapterUnityVersion;
 }
 
 + (Class<GADAdNetworkExtras>)networkExtrasClass {
-  return Nil;
+  return nil;
 }
 
 - (void)stopBeingDelegate {
-  [[GADMAdapterUnitySingleton sharedInstance] stopTrackingDelegate:self];
-  [_bannerAd stopBeingDelegate];
+  self.bannerAd.delegate = nil;
+  self.bannerAd = nil;
 }
 
 #pragma mark Interstitial Methods
@@ -64,127 +54,46 @@
   if (!connector) {
     return nil;
   }
-
   self = [super init];
   if (self) {
-    _networkConnector = connector;
+    _connector = connector;
   }
   return self;
 }
 
 - (void)getInterstitial {
-  id<GADMAdNetworkConnector> strongConnector = _networkConnector;
-  _gameID = [[[strongConnector credentials] objectForKey:kGADMAdapterUnityGameID] copy];
-  _placementID = [[[strongConnector credentials] objectForKey:kGADMAdapterUnityPlacementID] copy];
-  if (!_gameID || !_placementID) {
-    NSError *error = GADUnityErrorWithDescription(@"Game ID and Placement ID cannot be nil.");
-    [strongConnector adapter:self didFailAd:error];
-    return;
-  }
-  _isLoading = YES;
-  [[GADMAdapterUnitySingleton sharedInstance] requestInterstitialAdWithDelegate:self];
+  [UnityAds load:[[self.connector credentials] objectForKey:GADMAdapterUnityPlacementID] ?: @""
+      loadDelegate:[[GADMUnityInterstitialNetworkAdapterProxy alloc]
+                       initWithGADMAdNetworkConnector:self.connector
+                                              adapter:self]];
 }
 
 - (void)presentInterstitialFromRootViewController:(UIViewController *)rootViewController {
-  // We will send adapterWillPresentInterstitial callback before presenting unity ad because the ad
-  // has already loaded.
-  [_networkConnector adapterWillPresentInterstitial:self];
-  [[GADMAdapterUnitySingleton sharedInstance]
-      presentInterstitialAdForViewController:rootViewController
-                                    delegate:self];
+  [UnityAds show:rootViewController
+       placementId:[[self.connector credentials] objectForKey:GADMAdapterUnityPlacementID] ?: @""
+      showDelegate:[[GADMUnityInterstitialNetworkAdapterProxy alloc]
+                       initWithGADMAdNetworkConnector:self.connector
+                                              adapter:self]];
 }
 
 #pragma mark Banner Methods
 
 - (void)getBannerWithSize:(GADAdSize)adSize {
-  id<GADMAdNetworkConnector> strongConnector = _networkConnector;
-  _gameID = [strongConnector.credentials[kGADMAdapterUnityGameID] copy];
-  _placementID = [strongConnector.credentials[kGADMAdapterUnityPlacementID] copy];
-  if (!_gameID || !_placementID) {
-    NSError *error = GADUnityErrorWithDescription(@"Game ID and Placement ID cannot be nil.");
-    [strongConnector adapter:self didFailAd:error];
+  GADAdSize supportedSize = supportedAdSizeFromRequestedSize(adSize);
+  if (!IsGADAdSizeValid(supportedSize)) {
+    [self.connector adapter:self didFailAd:[NSError unsupportedBannerGADAdSize:adSize]];
     return;
   }
 
-  _bannerAd = [[GADMAdapterUnityBannerAd alloc] initWithGADMAdNetworkConnector:strongConnector
-                                                                       adapter:self];
-  [_bannerAd loadBannerWithSize:adSize];
-}
-
-#pragma mark GADMAdapterUnityDataProvider Methods
-
-- (NSString *)getGameID {
-  return _gameID;
-}
-
-- (NSString *)getPlacementID {
-  return _placementID;
-}
-
-#pragma mark - Unity Delegate Methods
-
-- (void)unityAdsPlacementStateChanged:(NSString *)placementId
-                             oldState:(UnityAdsPlacementState)oldState
-                             newState:(UnityAdsPlacementState)newState {
-  // This callback is not forwarded to the adapter by the GADMAdapterUnitySingleton and the adapter
-  // should use the unityAdsReady: and unityAdsDidError: callbacks to forward Unity Ads SDK state to
-  // Google Mobile Ads SDK.
-}
-
-- (void)unityAdsDidFinish:(NSString *)placementID withFinishState:(UnityAdsFinishState)state {
-  id<GADMAdNetworkConnector> strongNetworkConnector = _networkConnector;
-  if (strongNetworkConnector) {
-    [strongNetworkConnector adapterWillDismissInterstitial:self];
-    [strongNetworkConnector adapterDidDismissInterstitial:self];
-  }
-}
-
-- (void)unityAdsReady:(NSString *)placementID {
-  id<GADMAdNetworkConnector> strongNetworkConnector = _networkConnector;
-  if (!_isLoading) {
-    return;
-  }
-
-  if (strongNetworkConnector) {
-    [strongNetworkConnector adapterDidReceiveInterstitial:self];
-  }
-  _isLoading = NO;
-}
-
-- (void)unityAdsDidClick:(NSString *)placementID {
-  id<GADMAdNetworkConnector> strongNetworkConnector = _networkConnector;
-  // The Unity Ads SDK doesn't provide an event for leaving the application, so the adapter assumes
-  // that a click event indicates the user is leaving the application for a browser or deeplink, and
-  // notifies the Google Mobile Ads SDK accordingly.
-  if (strongNetworkConnector) {
-    [strongNetworkConnector adapterDidGetAdClick:self];
-    [strongNetworkConnector adapterWillLeaveApplication:self];
-  }
-}
-
-- (void)unityAdsDidError:(UnityAdsError)error withMessage:(NSString *)message {
-  id<GADMAdNetworkConnector> strongNetworkConnector = _networkConnector;
-  if (!_isLoading) {
-    // Unity Ads show error will only happen after the ad has been loaded. So, we will send
-    // dismiss/close callbacks.
-    if (error == kUnityAdsErrorShowError) {
-      if (strongNetworkConnector) {
-        [strongNetworkConnector adapterWillDismissInterstitial:self];
-        [strongNetworkConnector adapterDidDismissInterstitial:self];
-      }
-    }
-    return;
-  }
-
-  NSError *errorWithDescription = GADUnityErrorWithDescription(message);
-  if (strongNetworkConnector) {
-    [strongNetworkConnector adapter:self didFailAd:errorWithDescription];
-  }
-  _isLoading = NO;
-}
-
-- (void)unityAdsDidStart:(nonnull NSString *)placementId {
-  // nothing to do
+  self.bannerAd = [[UADSBannerView alloc]
+      initWithPlacementId:[[self.connector credentials] objectForKey:GADMAdapterUnityPlacementID]
+                              ?: @""
+                     size:supportedSize.size];
+  self.bannerAdDelegateProxy =
+      [[GADMUnityBannerNetworkAdapterProxy alloc] initWithGADMAdNetworkConnector:self.connector
+                                                                         adapter:self];
+  self.bannerAd.delegate = self.bannerAdDelegateProxy;
+  [self.bannerAd load];
 }
 
 @end

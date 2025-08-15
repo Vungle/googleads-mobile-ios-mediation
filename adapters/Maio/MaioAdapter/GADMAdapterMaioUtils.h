@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #import <Foundation/Foundation.h>
+#import <Maio/Maio.h>
+#import <MaioOB/MaioOB-Swift.h>
+#import "GADMediationAdapterMaio.h"
 
 /// Adds |object| to |set| if |object| is not nil.
 void GADMAdapterMaioMutableSetAddObject(NSMutableSet *_Nullable set, NSObject *_Nonnull object);
@@ -27,3 +30,11 @@ void GADMAdapterMaioMapTableRemoveObjectForKey(NSMapTable *_Nullable mapTable, i
 /// Sets |value| for |key| in |mapTable| if |value| is not nil.
 void GADMAdapterMaioMapTableSetObjectForKey(NSMapTable *_Nonnull mapTable,
                                             id<NSCopying> _Nullable key, id _Nullable value);
+
+/// Returns an NSError with code |code| and with NSLocalizedDescriptionKey and
+/// NSLocalizedFailureReasonErrorKey values set to |description|.
+NSError *_Nonnull GADMAdapterMaioErrorWithCodeAndDescription(GADMAdapterMaioErrorCode code,
+                                                             NSString *_Nonnull description);
+
+/// Returns an NSError representing a MaioFailReason.
+NSError *_Nonnull GADMAdapterMaioSDKErrorForFailReason(MaioFailReason reason);

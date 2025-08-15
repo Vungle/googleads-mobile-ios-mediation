@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #import "GADMAdapterIronSourceUtils.h"
+#import "GADMAdapterIronSourceConstants.h"
 
 void GADMAdapterIronSourceMutableSetAddObject(NSMutableSet *_Nullable set,
                                               NSObject *_Nonnull object) {
@@ -28,43 +29,41 @@ void GADMAdapterIronSourceMapTableSetObjectForKey(NSMapTable *_Nullable mapTable
   }
 }
 
+NSError *_Nonnull GADMAdapterIronSourceErrorWithCodeAndDescription(
+    GADMAdapterIronSourceErrorCode code, NSString *_Nonnull description) {
+  NSDictionary *userInfo =
+      @{NSLocalizedDescriptionKey : description, NSLocalizedFailureReasonErrorKey : description};
+  NSError *error = [NSError errorWithDomain:GADMAdapterIronSourceErrorDomain
+                                       code:code
+                                   userInfo:userInfo];
+  return error;
+}
+
 @implementation GADMAdapterIronSourceUtils
 
 #pragma mark Utils Methods
 
-+ (BOOL)isEmpty:(id)value {
++ (BOOL)isEmpty:(nullable id)value {
   return value == nil || [value isKindOfClass:[NSNull class]] ||
          ([value respondsToSelector:@selector(length)] && [(NSString *)value length] == 0) ||
          ([value respondsToSelector:@selector(length)] && [(NSData *)value length] == 0) ||
          ([value respondsToSelector:@selector(count)] && [(NSArray *)value count] == 0);
 }
 
-+ (NSError *)createErrorWith:(NSString *)description
-                   andReason:(NSString *)reason
-               andSuggestion:(NSString *)suggestion {
-  NSDictionary *userInfo = @{
-    NSLocalizedDescriptionKey : NSLocalizedString(description, nil),
-    NSLocalizedFailureReasonErrorKey : NSLocalizedString(reason, nil),
-    NSLocalizedRecoverySuggestionErrorKey : NSLocalizedString(suggestion, nil)
-  };
-
-  return [NSError errorWithDomain:NSStringFromClass([self class]) code:0 userInfo:userInfo];
-}
-
-+ (void)onLog:(NSString *)log {
++ (void)onLog:(nonnull NSString *)log {
   NSLog(@"IronSourceAdapter: %@", log);
 }
 
-+ (NSString *)getAdMobSDKVersion {
++ (nonnull NSString *)getAdMobSDKVersion {
   NSString *version = @"";
-  NSString *sdkVersion = [GADRequest sdkVersion];
+  NSString *sdkVersion = GADMobileAds.sharedInstance.sdkVersion;
   @try {
     NSUInteger versionIndex = [sdkVersion rangeOfString:@"-v"].location + 1;
     version = [sdkVersion substringFromIndex:versionIndex];
     version = [version stringByReplacingOccurrencesOfString:@"." withString:@""];
 
   } @catch (NSException *exception) {
-    NSLog(@"Unable to parse AdMob SDK version");
+    NSLog(@"Unable to parse AdMob SDK version.");
     version = @"";
   }
   return version;

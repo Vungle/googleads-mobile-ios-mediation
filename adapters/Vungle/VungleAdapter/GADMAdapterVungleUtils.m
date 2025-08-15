@@ -34,16 +34,97 @@ void GADMAdapterVungleMapTableRemoveObjectForKey(NSMapTable *_Nullable mapTable,
   }
 }
 
-NSError *_Nonnull GADMAdapterVungleErrorWithCodeAndDescription(NSInteger code,
+void GADMAdapterVungleMutableDictionarySetObjectForKey(NSMutableDictionary *_Nonnull dictionary,
+                                                       id<NSCopying> _Nullable key,
+                                                       id _Nullable value) {
+  if (value && key) {
+    dictionary[key] = value;  // Allow pattern.
+  }
+}
+
+void GADMAdapterVungleUserDefaultsRemoveObjectForKey(NSUserDefaults *_Nonnull userDefaults,
+                                                     id _Nullable key) {
+  if (key) {
+    [userDefaults removeObjectForKey:key];  // Allow pattern.
+  }
+}
+
+void GADMAdapterVungleMutableDictionaryRemoveObjectForKey(NSMutableDictionary *_Nonnull dictionary,
+                                                          id<NSCopying> _Nullable key) {
+  if (key) {
+    [dictionary removeObjectForKey:key];  // Allow pattern.
+  }
+}
+
+NSDictionary *_Nullable GADMAdapterVunglePlaybackOptionsDictionaryForExtras(
+    VungleAdNetworkExtras *_Nullable vungleAdNetworkExtras) {
+  NSMutableDictionary *options = nil;
+  if (vungleAdNetworkExtras) {
+    options = [[NSMutableDictionary alloc] init];
+
+    if (vungleAdNetworkExtras.muteIsSet) {
+      GADMAdapterVungleMutableDictionarySetObjectForKey(options, VunglePlayAdOptionKeyStartMuted,
+                                                        @(vungleAdNetworkExtras.muted));
+    }
+    if (vungleAdNetworkExtras.userId) {
+      GADMAdapterVungleMutableDictionarySetObjectForKey(options, VunglePlayAdOptionKeyUser,
+                                                        vungleAdNetworkExtras.userId);
+    }
+    if (vungleAdNetworkExtras.ordinal) {
+      GADMAdapterVungleMutableDictionarySetObjectForKey(options, VunglePlayAdOptionKeyOrdinal,
+                                                        @(vungleAdNetworkExtras.ordinal));
+    }
+    if (vungleAdNetworkExtras.flexViewAutoDismissSeconds) {
+      GADMAdapterVungleMutableDictionarySetObjectForKey(
+          options, VunglePlayAdOptionKeyFlexViewAutoDismissSeconds,
+          @(vungleAdNetworkExtras.flexViewAutoDismissSeconds));
+    }
+    if (vungleAdNetworkExtras.orientations) {
+      int appOrientation = [vungleAdNetworkExtras.orientations intValue];
+      NSNumber *orientations = @(UIInterfaceOrientationMaskAll);
+      if (appOrientation == 1) {
+        orientations = @(UIInterfaceOrientationMaskLandscape);
+      } else if (appOrientation == 2) {
+        orientations = @(UIInterfaceOrientationMaskPortrait);
+      }
+      GADMAdapterVungleMutableDictionarySetObjectForKey(options, VunglePlayAdOptionKeyOrientations,
+                                                        orientations);
+    }
+  }
+  return options;
+}
+
+NSError *_Nonnull GADMAdapterVungleErrorWithCodeAndDescription(GADMAdapterVungleErrorCode code,
                                                                NSString *_Nonnull description) {
-  NSDictionary<NSString *, NSString *> *userInfo = @{NSLocalizedDescriptionKey : description};
-  return [NSError errorWithDomain:kGADMAdapterVungleErrorDomain code:code userInfo:userInfo];
+  NSDictionary<NSString *, NSString *> *userInfo =
+      @{NSLocalizedDescriptionKey : description, NSLocalizedFailureReasonErrorKey : description};
+  NSError *error = [NSError errorWithDomain:GADMAdapterVungleErrorDomain
+                                       code:code
+                                   userInfo:userInfo];
+  return error;
+}
+
+VungleAdSize GADMAdapterVungleAdSizeForCGSize(CGSize adSize) {
+  if (adSize.height == GADAdSizeLeaderboard.size.height) {
+    return VungleAdSizeBannerLeaderboard;
+  }
+
+  if (adSize.height != GADAdSizeBanner.size.height) {
+    return VungleAdSizeUnknown;
+  }
+
+  // Height is 50.
+  if (adSize.width < GADAdSizeBanner.size.width) {
+    return VungleAdSizeBannerShort;
+  }
+
+  return VungleAdSizeBanner;
 }
 
 @implementation GADMAdapterVungleUtils
 
 + (nullable NSString *)findAppID:(nullable NSDictionary *)serverParameters {
-  NSString *appId = serverParameters[kGADMAdapterVungleApplicationID];
+  NSString *appId = serverParameters[GADMAdapterVungleApplicationID];
   if (!appId) {
     NSString *const message = @"Vungle app ID should be specified!";
     NSLog(message);
@@ -54,7 +135,7 @@ NSError *_Nonnull GADMAdapterVungleErrorWithCodeAndDescription(NSInteger code,
 
 + (nullable NSString *)findPlacement:(nullable NSDictionary *)serverParameters
                        networkExtras:(nullable VungleAdNetworkExtras *)networkExtras {
-  NSString *ret = serverParameters[kGADMAdapterVunglePlacementID];
+  NSString *ret = serverParameters[GADMAdapterVunglePlacementID];
   if (networkExtras && networkExtras.playingPlacement) {
     if (ret) {
       NSLog(@"'placementID' had a value in both serverParameters and networkExtras. "

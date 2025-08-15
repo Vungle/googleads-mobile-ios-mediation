@@ -15,7 +15,6 @@
 #import "GADMAdapterMaioAdsManager.h"
 #import "GADMAdapterMaioUtils.h"
 #import "GADMMaioConstants.h"
-#import "GADMMaioError.h"
 
 @interface GADMAdapterMaioAdsManager ()
 
@@ -35,7 +34,7 @@ static NSMutableDictionary<NSString *, GADMAdapterMaioAdsManager *> *instances;
   instances = [[NSMutableDictionary alloc] init];
 }
 
-+ (GADMAdapterMaioAdsManager *)getMaioAdsManagerByMediaId:(NSString *)mediaId {
++ (nonnull GADMAdapterMaioAdsManager *)getMaioAdsManagerByMediaId:(nonnull NSString *)mediaId {
   @synchronized(instances) {
     GADMAdapterMaioAdsManager *instance = instances[mediaId];
     if (!instance) {
@@ -58,7 +57,8 @@ static NSMutableDictionary<NSString *, GADMAdapterMaioAdsManager *> *instances;
   return self;
 }
 
-- (void)initializeMaioSDKWithCompletionHandler:(MaioInitCompletionHandler)completionHandler {
+- (void)initializeMaioSDKWithCompletionHandler:
+    (nonnull MaioInitCompletionHandler)completionHandler {
   if (self.initState == INITIALIZED) {
     completionHandler(nil);
     return;
@@ -68,6 +68,7 @@ static NSMutableDictionary<NSString *, GADMAdapterMaioAdsManager *> *instances;
     self.maioInstance = [Maio startWithNonDefaultMediaId:self.mediaId delegate:self];
     self.initState = INITIALIZING;
   }
+
   @synchronized(self.completionHandlers) {
     GADMAdapterMaioMutableArrayAddObject(self.completionHandlers, completionHandler);
   }
@@ -95,25 +96,29 @@ static NSMutableDictionary<NSString *, GADMAdapterMaioAdsManager *> *instances;
   }
 }
 
-- (NSError *)loadAdForZoneId:(NSString *)zoneId delegate:(id<MaioDelegate>)delegate {
+- (nullable NSError *)loadAdForZoneId:(nonnull NSString *)zoneId
+                             delegate:(nonnull id<MaioDelegate>)delegate {
   if ([self getAdapterForZoneID:zoneId]) {
-    NSString *errorDesc =
-        [NSString stringWithFormat:@"Maio does not supporting requesting a second ad for the same "
+    NSString *description =
+        [NSString stringWithFormat:@"maio does not support requesting a second ad for the same "
                                    @"zone ID while the first request is still in progress."];
-    NSDictionary *errorInfo =
-        [NSDictionary dictionaryWithObjectsAndKeys:errorDesc, NSLocalizedDescriptionKey, nil];
-    return [NSError errorWithDomain:kGADMMaioErrorDomain code:0 userInfo:errorInfo];
-  } else {
-    [self addAdapter:delegate forZoneID:zoneId];
+    return GADMAdapterMaioErrorWithCodeAndDescription(GADMAdapterMaioErrorAdAlreadyLoaded,
+                                                      description);
   }
 
-  if ([self.maioInstance canShowAtZoneId:zoneId]) {
-    [delegate maioDidChangeCanShow:zoneId newValue:YES];
+  // If maio does not have an ad ready to be shown, then we fail the ad request to avoid timeouts.
+  if (![self.maioInstance canShowAtZoneId:zoneId]) {
+    return GADMAdapterMaioErrorWithCodeAndDescription(GADMAdapterMaioErrorAdNotAvailable,
+                                                      @"No ad available.");
   }
+
+  [self addAdapter:delegate forZoneID:zoneId];
+  [delegate maioDidChangeCanShow:zoneId newValue:YES];
   return nil;
 }
 
-- (void)showAdForZoneId:(NSString *)zoneId rootViewController:(UIViewController *)viewcontroller {
+- (void)showAdForZoneId:(nonnull NSString *)zoneId
+     rootViewController:(nonnull UIViewController *)viewcontroller {
   id<MaioDelegate> delegate = [self getAdapterForZoneID:zoneId];
   if (delegate && [self.maioInstance canShowAtZoneId:zoneId]) {
     [self.maioInstance showAtZoneId:zoneId vc:viewcontroller];

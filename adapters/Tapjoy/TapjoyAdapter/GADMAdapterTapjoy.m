@@ -17,11 +17,13 @@
 #import <Tapjoy/Tapjoy.h>
 
 #import "GADMAdapterTapjoyConstants.h"
+#import "GADMAdapterTapjoyDelegate.h"
 #import "GADMAdapterTapjoySingleton.h"
+#import "GADMAdapterTapjoyUtils.h"
 #import "GADMTapjoyExtras.h"
 #import "GADMediationAdapterTapjoy.h"
 
-@interface GADMAdapterTapjoy () <TJPlacementDelegate, TJPlacementVideoDelegate>
+@interface GADMAdapterTapjoy () <GADMAdapterTapjoyDelegate>
 @end
 
 @implementation GADMAdapterTapjoy {
@@ -36,7 +38,7 @@
 }
 
 + (nonnull NSString *)adapterVersion {
-  return kGADMAdapterTapjoyVersion;
+  return GADMAdapterTapjoyVersion;
 }
 
 + (nonnull Class<GADAdNetworkExtras>)networkExtrasClass {
@@ -47,7 +49,7 @@
   return [GADMediationAdapterTapjoy class];
 }
 
-#pragma mark Interstitial
+#pragma mark - Interstitial
 
 - (nullable instancetype)initWithGADMAdNetworkConnector:
     (nonnull id<GADMAdNetworkConnector>)connector {
@@ -63,16 +65,13 @@
 
 - (void)getInterstitial {
   id<GADMAdNetworkConnector> strongConnector = _interstitialConnector;
-  NSString *sdkKey = strongConnector.credentials[kGADMAdapterTapjoySdkKey];
-  _placementName = strongConnector.credentials[kGADMAdapterTapjoyPlacementKey];
+  NSString *sdkKey = strongConnector.credentials[GADMAdapterTapjoySdkKey];
+  _placementName = strongConnector.credentials[GADMAdapterTapjoyPlacementKey];
 
   if (!sdkKey.length || !_placementName.length) {
-    NSError *adapterError = [NSError
-        errorWithDomain:kGADMAdapterTapjoyErrorDomain
-                   code:0
-               userInfo:@{
-                 NSLocalizedDescriptionKey : @"Did not receive valid Tapjoy server parameters"
-               }];
+    NSError *adapterError = GADMAdapterTapjoyErrorWithCodeAndDescription(
+        GADMAdapterTapjoyErrorInvalidServerParameters,
+        @"Did not receive valid Tapjoy server parameters.");
     [strongConnector adapter:self didFailAd:adapterError];
     return;
   }
@@ -80,28 +79,33 @@
   GADMTapjoyExtras *extras = [strongConnector networkExtras];
   GADMAdapterTapjoySingleton *sharedInstance = [GADMAdapterTapjoySingleton sharedInstance];
 
-  // if not yet connected, wait for connect response before requesting placement.
   if ([Tapjoy isConnected]) {
     [Tapjoy setDebugEnabled:extras.debugEnabled];
     _intPlacement = [sharedInstance requestAdForPlacementName:_placementName delegate:self];
-  } else {
-    GADMAdapterTapjoy __weak *weakSelf = self;
-    NSDictionary *connectOptions =
-        @{TJC_OPTION_ENABLE_LOGGING : [NSNumber numberWithInt:extras.debugEnabled]};
-    [sharedInstance
-        initializeTapjoySDKWithSDKKey:sdkKey
-                              options:connectOptions
-                    completionHandler:^(NSError *error) {
-                      GADMAdapterTapjoy __strong *strongSelf = weakSelf;
-                      if (error) {
-                        [strongSelf->_interstitialConnector adapter:self didFailAd:error];
-                      } else {
-                        strongSelf->_intPlacement = [[GADMAdapterTapjoySingleton sharedInstance]
-                            requestAdForPlacementName:strongSelf->_placementName
-                                             delegate:strongSelf];
-                      }
-                    }];
+    return;
   }
+
+  // Tapjoy is not yet connected. Wait for initialization to complete before requesting a placement.
+  NSDictionary<NSString *, NSNumber *> *connectOptions =
+      @{TJC_OPTION_ENABLE_LOGGING : @(extras.debugEnabled)};
+  GADMAdapterTapjoy __weak *weakSelf = self;
+  [sharedInstance initializeTapjoySDKWithSDKKey:sdkKey
+                                        options:connectOptions
+                              completionHandler:^(NSError *error) {
+                                GADMAdapterTapjoy __strong *strongSelf = weakSelf;
+                                if (!strongSelf) {
+                                  return;
+                                }
+
+                                if (error) {
+                                  [strongSelf->_interstitialConnector adapter:self didFailAd:error];
+                                  return;
+                                }
+                                strongSelf->_intPlacement =
+                                    [[GADMAdapterTapjoySingleton sharedInstance]
+                                        requestAdForPlacementName:strongSelf->_placementName
+                                                         delegate:strongSelf];
+                              }];
 }
 
 - (void)presentInterstitialFromRootViewController:(nonnull UIViewController *)rootViewController {
@@ -113,30 +117,31 @@
 }
 
 - (void)getBannerWithSize:(GADAdSize)adSize {
-  NSError *adapterError = [NSError
-      errorWithDomain:kGADMAdapterTapjoyErrorDomain
-                 code:0
-             userInfo:@{NSLocalizedDescriptionKey : @"This adapter doesn't support banner ads."}];
+  NSError *adapterError = GADMAdapterTapjoyErrorWithCodeAndDescription(
+      GADMAdapterTapjoyErrorAdFormatNotSupported, @"This adapter doesn't support banner ads.");
   [_interstitialConnector adapter:self didFailAd:adapterError];
 }
 
 #pragma mark - TJPlacementDelegate methods
+
 - (void)requestDidSucceed:(nonnull TJPlacement *)placement {
+  // If the placement's content is not available at this time, then the request is considered a
+  // failure.
   if (!placement.contentAvailable) {
-    NSError *adapterError = [NSError
-        errorWithDomain:kGADMAdapterTapjoyErrorDomain
-                   code:0
-               userInfo:@{NSLocalizedDescriptionKey : @"Tapjoy interstitial not available"}];
-    [_interstitialConnector adapter:self didFailAd:adapterError];
+    NSError *loadError = GADMAdapterTapjoyErrorWithCodeAndDescription(
+        GADMAdapterTapjoyErrorPlacementContentNotAvailable, @"Ad not available.");
+    [_interstitialConnector adapter:self didFailAd:loadError];
   }
 }
 
-- (void)requestDidFail:(nonnull TJPlacement *)placement error:(nonnull NSError *)error {
-  NSError *adapterError = [NSError
-      errorWithDomain:kGADMAdapterTapjoyErrorDomain
-                 code:0
-             userInfo:@{NSLocalizedDescriptionKey : @"Tapjoy interstitial failed to load"}];
-  [_interstitialConnector adapter:self didFailAd:adapterError];
+- (void)requestDidFail:(nonnull TJPlacement *)placement error:(nullable NSError *)error {
+  if (!error) {
+    NSError *nullError = GADMAdapterTapjoyErrorWithCodeAndDescription(
+        GADMAdapterTapjoyErrorUnknown, @"Tapjoy SDK placement unknown error.");
+    [_interstitialConnector adapter:self didFailAd:nullError];
+    return;
+  }
+  [_interstitialConnector adapter:self didFailAd:error];
 }
 
 - (void)contentIsReady:(nonnull TJPlacement *)placement {
@@ -147,30 +152,44 @@
   [_interstitialConnector adapterWillPresentInterstitial:self];
 }
 
-- (void)contentDidDisappear:(nonnull TJPlacement *)placement {
-  id<GADMAdNetworkConnector> strongConnector = _interstitialConnector;
-  [strongConnector adapterWillDismissInterstitial:self];
-  [strongConnector adapterDidDismissInterstitial:self];
-}
-
 - (void)didClick:(nonnull TJPlacement *)placement {
   id<GADMAdNetworkConnector> strongConnector = _interstitialConnector;
+  if (!strongConnector) {
+    return;
+  }
+
   [strongConnector adapterDidGetAdClick:self];
   [strongConnector adapterWillLeaveApplication:self];
 }
 
-#pragma mark Tapjoy Video
+- (void)contentDidDisappear:(nonnull TJPlacement *)placement {
+  id<GADMAdNetworkConnector> strongConnector = _interstitialConnector;
+  if (!strongConnector) {
+    return;
+  }
+
+  [strongConnector adapterWillDismissInterstitial:self];
+  [strongConnector adapterDidDismissInterstitial:self];
+}
+
+#pragma mark - TJPlacementVideoDelegate methods
 
 - (void)videoDidStart:(nonnull TJPlacement *)placement {
-  // Do nothing
+  // Do nothing.
 }
 
 - (void)videoDidComplete:(nonnull TJPlacement *)placement {
-  // Do nothing
+  // Do nothing.
 }
 
-- (void)videoDidFail:(nonnull TJPlacement *)placement error:(nonnull NSString *)errorMsg {
-  // Do nothing
+- (void)videoDidFail:(nonnull TJPlacement *)placement error:(nullable NSString *)errorMsg {
+  // Do nothing.
+}
+
+#pragma mark - GADMAdapterTapjoyDelegate
+
+- (void)didFailToLoadWithError:(nonnull NSError *)error {
+  [_interstitialConnector adapter:self didFailAd:error];
 }
 
 @end

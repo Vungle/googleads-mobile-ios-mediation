@@ -10,6 +10,8 @@
 #import <Foundation/Foundation.h>
 #import <GoogleMobileAds/GoogleMobileAds.h>
 
+#import "GADMediationAdapterAppLovin.h"
+
 #define IS_IPHONE ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
 #define IS_IPAD ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
 
@@ -45,21 +47,27 @@ void GADMAdapterAppLovinMutableDictionarySetObjectForKey(NSMutableDictionary *_N
 void GADMAdapterAppLovinMutableDictionaryRemoveObjectForKey(
     NSMutableDictionary *_Nonnull dictionary, id<NSCopying> _Nullable key);
 
-/// Returns an error with the provided description and error code.
-NSError *_Nonnull GADMAdapterAppLovinErrorWithCodeAndDescription(GADErrorCode code,
+/// Returns an NSError with code |code| and with NSLocalizedDescriptionKey and
+/// NSLocalizedFailureReasonErrorKey values set to |description|.
+NSError *_Nonnull GADMAdapterAppLovinErrorWithCodeAndDescription(GADMAdapterAppLovinErrorCode code,
                                                                  NSString *_Nonnull description);
+
+/// Returns an NSError with the provided error code.
+NSError *_Nonnull GADMAdapterAppLovinSDKErrorWithCode(NSInteger code);
+
+/// Returns an error where the instance of the AppLovin SDK for a given SDKKey cannot be found.
+NSError *_Nonnull GADMAdapterAppLovinNilSDKError(NSString *_Nonnull SDKKey);
 
 @interface GADMAdapterAppLovinUtils : NSObject
 
-/// Retrieves the appropriate instance of AppLovin's SDK from the SDK key given in the credentials,
-/// or Info.plist.
-+ (nullable ALSdk *)retrieveSDKFromCredentials:(nonnull NSDictionary *)credentials;
+/// Retrieves the AppLovin SDK key from the specified |credentials| or from Info.plist.
++ (nullable NSString *)retrieveSDKKeyFromCredentials:(nonnull NSDictionary *)credentials;
 
 /// Retrieve an instance of the AppLovin SDK with the provided SDK key.
-+ (nullable ALSdk *)retrieveSDKFromSDKKey:(nonnull NSString *)sdkKey;
++ (nullable ALSdk *)retrieveSDKFromSDKKey:(nonnull NSString *)SDKKey;
 
 /// Returns whether the given string is a valid SDK key or not.
-+ (BOOL)isValidAppLovinSDKKey:(nonnull NSString *)sdkKey;
++ (BOOL)isValidAppLovinSDKKey:(nonnull NSString *)SDKKey;
 
 /// Retrieve the SDK key from the Info.plist, if any.
 + (nullable NSString *)infoDictionarySDKKey;
@@ -72,9 +80,6 @@ NSError *_Nonnull GADMAdapterAppLovinErrorWithCodeAndDescription(GADErrorCode co
 /// default zone if no zone identifier exists.
 + (nullable NSString *)zoneIdentifierForAdConfiguration:
     (nonnull GADMediationAdConfiguration *)adConfig;
-
-/// Convert the given AppLovin SDK error code into the appropriate AdMob error code.
-+ (GADErrorCode)toAdMobErrorCode:(int)appLovinErrorCode;
 
 /// Returns the closest ALAdSize size from the requested GADAdSize.
 + (nullable ALAdSize *)appLovinAdSizeFromRequestedSize:(GADAdSize)size;

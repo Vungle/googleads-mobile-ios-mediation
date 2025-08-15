@@ -27,6 +27,8 @@ typedef NS_ENUM(NSInteger, SampleErrorCode) {
   SampleErrorCodeNoInventory,   ///< No inventory.
 };
 
+extern NSString *const SampleSDKVersion = @"1.0.0";
+
 /// The SampleAdRequest class is used for making an ad request.
 @interface SampleAdRequest : NSObject
 
@@ -35,5 +37,8 @@ typedef NS_ENUM(NSInteger, SampleErrorCode) {
 
 /// Array of keyword strings for describing the current user activity.
 @property(nonatomic, copy) NSArray<NSString *> *keywords;
+
+/// A flag that indicates whether ad video audio should be muted.
+@property(nonatomic) BOOL mute;
 
 @end

@@ -12,22 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#import <Chartboost/CHBAdDelegate.h>
+#if __has_include(<Chartboost/Chartboost.h>)
 #import <Chartboost/Chartboost.h>
+#else
+#import "Chartboost.h"
+#endif
 #import <Foundation/Foundation.h>
 
-/// Returns an NSError with NSLocalizedDescriptionKey and NSLocalizedFailureReasonErrorKey values
-/// set to |description|.
-NSError *GADChartboostErrorWithDescription(NSString *description);
-
-/// Returns an NSError with description acquired from the CBLoadError.
-NSError *adRequestErrorTypeForCBLoadError(CBLoadError error);
-
 /// Returns an NSError with description acquired from the CHBCacheError.
-NSError *NSErrorForCHBCacheError(CHBCacheError *error);
+NSError *GADMChartboostErrorForCHBCacheError(CHBCacheError *error);
 
 /// Returns an NSError with description acquired from the CHBShowError.
-NSError *NSErrorForCHBShowError(CHBShowError *error);
+NSError *GADMChartboostErrorForCHBShowError(CHBShowError *error);
 
 /// Returns an NSError with description acquired from the CHBClickError.
-NSError *NSErrorForCHBClickError(CHBClickError *error);
+NSError *GADMChartboostErrorForCHBClickError(CHBClickError *error);

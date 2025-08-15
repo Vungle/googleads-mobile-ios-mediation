@@ -17,12 +17,11 @@
 // limitations under the License.
 //
 
-#import <SampleAdSDK/SampleAdSDK.h>
-
 #import "SampleAdapter.h"
+#import <SampleAdSDK/SampleAdSDK.h>
 #import "SampleAdapterConstants.h"
 #import "SampleAdapterDelegate.h"
-#import "SampleAdapterMediatedNativeAd.h"
+#import "SampleExtras.h"
 
 @interface SampleAdapter () <SampleRewardedAdDelegate, GADMediationRewardedAd> {
   /// Connector from Google Mobile Ads SDK to receive ad configurations.
@@ -45,12 +44,6 @@
 
   /// Native ad view options.
   GADNativeAdViewAdOptions *_nativeAdViewAdOptions;
-
-  /// Native ad types requested.
-  NSArray<GADAdLoaderAdType> *_nativeAdTypes;
-
-  /// The configurations used to initialize sample rewarded ad.
-  GADMediationRewardedAdConfiguration *_adConfig;
 
   /// Handles any callback when the sample rewarded ad finishes loading.
   GADMediationRewardedLoadCompletionHandler _loadCompletionHandler;
@@ -116,33 +109,6 @@
 
   SampleNativeAdRequest *sampleRequest = [[SampleNativeAdRequest alloc] init];
 
-  // Part of the adapter's job is to examine the ad types and options, and then create a request for
-  // the mediated network's SDK that matches them.
-  //
-  // Care needs to be taken to make sure the adapter respects the publisher's wishes in regard to
-  // native ad formats. For example, if your ad network only provides app install ads, and the
-  // publisher requests content ads alone, the adapter must report an error by calling the
-  // connector's adapter:didFailAd: method with an error code set to kGADErrorInvalidRequest. It
-  // should *not* request an app install ad anyway, and then attempt to map it to the content ad
-  // format.
-  //
-  // In the case where an SDK doesn't distinguish between these ad types, this is not relevant.
-  // For example, the Admob SDK now supports the unified native ad type, which covers both the app
-  // install and content ad ad types.
-  BOOL requestedUnified = [adTypes containsObject:kGADAdLoaderAdTypeUnifiedNative];
-
-  if (!requestedUnified) {
-    NSString *description = @"You must request a unified native ad.";
-    NSDictionary *userInfo =
-        @{NSLocalizedDescriptionKey : description, NSLocalizedFailureReasonErrorKey : description};
-    NSError *error = [NSError errorWithDomain:@"com.google.mediation.sample"
-                                         code:0
-                                     userInfo:userInfo];
-    [_connector adapter:self didFailAd:error];
-    return;
-  }
-  _nativeAdTypes = adTypes;
-
   // The Google Mobile Ads SDK requires the image assets to be downloaded automatically unless the
   // publisher specifies otherwise by using the GADNativeAdImageAdLoaderOptions object's
   // disableImageLoading property. If your network doesn't have an option like this and instead only
@@ -159,24 +125,25 @@
     if ([loaderOptions isKindOfClass:[GADNativeAdImageAdLoaderOptions class]]) {
       GADNativeAdImageAdLoaderOptions *imageOptions =
           (GADNativeAdImageAdLoaderOptions *)loaderOptions;
-      switch (imageOptions.preferredImageOrientation) {
-        case GADNativeAdImageAdLoaderOptionsOrientationLandscape:
-          sampleRequest.preferredImageOrientation = NativeAdImageOrientationLandscape;
-          break;
-        case GADNativeAdImageAdLoaderOptionsOrientationPortrait:
-          sampleRequest.preferredImageOrientation = NativeAdImageOrientationPortrait;
-          break;
-        case GADNativeAdImageAdLoaderOptionsOrientationAny:
-        default:
-          sampleRequest.preferredImageOrientation = NativeAdImageOrientationAny;
-          break;
-      }
-
       sampleRequest.shouldRequestMultipleImages = imageOptions.shouldRequestMultipleImages;
 
       // If the GADNativeAdImageAdLoaderOptions' disableImageLoading property is YES, the adapter
       // should send just the URLs for the images.
       sampleRequest.shouldDownloadImages = !imageOptions.disableImageLoading;
+    } else if ([loaderOptions isKindOfClass:[GADNativeAdMediaAdLoaderOptions class]]) {
+      GADNativeAdMediaAdLoaderOptions *mediaOptions =
+          (GADNativeAdMediaAdLoaderOptions *)loaderOptions;
+      switch (mediaOptions.mediaAspectRatio) {
+        case GADMediaAspectRatioLandscape:
+          sampleRequest.preferredImageOrientation = NativeAdImageOrientationLandscape;
+          break;
+        case GADMediaAspectRatioPortrait:
+          sampleRequest.preferredImageOrientation = NativeAdImageOrientationPortrait;
+          break;
+        default:
+          sampleRequest.preferredImageOrientation = NativeAdImageOrientationAny;
+          break;
+      }
     } else if ([loaderOptions isKindOfClass:[GADNativeAdViewAdOptions class]]) {
       _nativeAdViewAdOptions = (GADNativeAdViewAdOptions *)loaderOptions;
     }
@@ -208,16 +175,10 @@
   return _nativeAdViewAdOptions;
 }
 
-- (NSArray<GADAdLoaderAdType> *)adTypes {
-  return _nativeAdTypes;
-}
-
 #pragma mark GADMediationAdapter implementation
 
 + (Class<GADAdNetworkExtras>)networkExtrasClass {
-  // OPTIONAL: Create your own class implementing GADAdNetworkExtras and return that class type
-  // here for your publishers to use. This class does not use extras.
-  return Nil;
+  return [SampleExtras class];
 }
 
 + (GADVersionNumber)adSDKVersion {
@@ -250,8 +211,8 @@
 
 + (void)setUpWithConfiguration:(GADMediationServerConfiguration *)configuration
              completionHandler:(GADMediationAdapterSetUpCompletionBlock)completionHandler {
-  /// Since the Sample SDK doesn't need to initialize, the completion handler is called directly
-  /// here.
+  // Since the Sample SDK doesn't need to initialize, the completion handler is called directly
+  // here.
   completionHandler(nil);
 }
 
@@ -262,16 +223,32 @@
 - (void)loadRewardedAdForAdConfiguration:(GADMediationRewardedAdConfiguration *)adConfiguration
                        completionHandler:
                            (GADMediationRewardedLoadCompletionHandler)completionHandler {
-  _adConfig = adConfiguration;
   _loadCompletionHandler = completionHandler;
 
-  NSString *adUnit = _adConfig.credentials.settings[SampleSDKAdUnitID];
+  NSString *adUnit = adConfiguration.credentials.settings[SampleSDKAdUnitIDKey];
+  SampleExtras *extras = adConfiguration.extras;
+
   _rewardedAd = [[SampleRewardedAd alloc] initWithAdUnitID:adUnit];
+  _rewardedAd.enableDebugLogging = extras.enableDebugLogging;
+
+  // Check the extras to see if the request should be customized.
+  SampleAdRequest *request = [[SampleAdRequest alloc] init];
+  request.mute = extras.muteAudio;
+
+  // Set the delegate on the rewarded ad to listen for callbacks from the Sample SDK.
   _rewardedAd.delegate = self;
-  [_rewardedAd fetchAd:[[SampleAdRequest alloc] init]];
+  [_rewardedAd fetchAd:request];
 }
 
 - (void)presentFromViewController:(nonnull UIViewController *)viewController {
+  if (!_rewardedAd.isReady) {
+    NSError *error =
+        [NSError errorWithDomain:kAdapterErrorDomain
+                            code:0
+                        userInfo:@{NSLocalizedDescriptionKey : @"Unable to display ad."}];
+    [_rewardedAdDelegate didFailToPresentWithError:error];
+    return;
+  }
   [_rewardedAd presentFromRootViewController:viewController];
 }
 
@@ -287,15 +264,16 @@
   [_rewardedAdDelegate didDismissFullScreenView];
 }
 
-- (void)rewardedAdDidFailToLoadWithError:(SampleErrorCode)error {
-  [_rewardedAdDelegate didFailToPresentWithError:[NSError errorWithDomain:kAdapterErrorDomain
-                                                                     code:error
-                                                                 userInfo:nil]];
+- (void)rewardedAdDidFailToLoadWithError:(SampleErrorCode)errorCode {
+  _loadCompletionHandler(nil, [NSError errorWithDomain:kAdapterErrorDomain
+                                                  code:GADErrorNoFill
+                                              userInfo:nil]);
 }
 
-- (void)rewardedAdDidpresent:(nonnull SampleRewardedAd *)rewardedAd {
+- (void)rewardedAdDidPresent:(nonnull SampleRewardedAd *)rewardedAd {
   [_rewardedAdDelegate willPresentFullScreenView];
   [_rewardedAdDelegate didStartVideo];
+  [_rewardedAdDelegate reportImpression];
 }
 
 - (void)rewardedAd:(nonnull SampleRewardedAd *)rewardedAd userDidEarnReward:(NSUInteger)reward {

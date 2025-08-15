@@ -29,26 +29,17 @@
 			name = Framework;
 			productName = Framework;
 		};
-		7DFABB531DA86A1100322E02 /* FatAdapter */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = 7DFABB541DA86A1100322E02 /* Build configuration list for PBXAggregateTarget "FatAdapter" */;
-			buildPhases = (
-				7DD2DCBD1DD12E3E00888FDB /* Static Library Script */,
-			);
-			dependencies = (
-			);
-			name = FatAdapter;
-			productName = FatAdapter;
-		};
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		2306AE7B26A7829B00494B68 /* GADMAdapterAdColonyRTBBannerRenderer.h in Headers */ = {isa = PBXBuildFile; fileRef = 2306AE7526A7829B00494B68 /* GADMAdapterAdColonyRTBBannerRenderer.h */; };
+		2306AE7C26A7829B00494B68 /* GADMAdapterAdColonyRTBBannerRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 2306AE7626A7829B00494B68 /* GADMAdapterAdColonyRTBBannerRenderer.m */; };
+		2306AE7D26A7829B00494B68 /* GADMAdapterAdColonyRTBInterstitialRenderer.h in Headers */ = {isa = PBXBuildFile; fileRef = 2306AE7726A7829B00494B68 /* GADMAdapterAdColonyRTBInterstitialRenderer.h */; };
+		2306AE7E26A7829B00494B68 /* GADMAdapterAdColonyRTBInterstitialRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 2306AE7826A7829B00494B68 /* GADMAdapterAdColonyRTBInterstitialRenderer.m */; };
+		2306AE7F26A7829B00494B68 /* GADMAdapterAdColonyRewardedRenderer.h in Headers */ = {isa = PBXBuildFile; fileRef = 2306AE7926A7829B00494B68 /* GADMAdapterAdColonyRewardedRenderer.h */; };
+		2306AE8026A7829B00494B68 /* GADMAdapterAdColonyRewardedRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 2306AE7A26A7829B00494B68 /* GADMAdapterAdColonyRewardedRenderer.m */; };
 		4534E82122862B98000381F8 /* GADMediationAdapterAdColony.h in Headers */ = {isa = PBXBuildFile; fileRef = 4534E82022862B98000381F8 /* GADMediationAdapterAdColony.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4547607A228612BC0041D40B /* GADMAdapterAdColonyRewardedRenderer.h in Headers */ = {isa = PBXBuildFile; fileRef = 45476078228612BC0041D40B /* GADMAdapterAdColonyRewardedRenderer.h */; };
-		4547607B228612BC0041D40B /* GADMAdapterAdColonyRewardedRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 45476079228612BC0041D40B /* GADMAdapterAdColonyRewardedRenderer.m */; };
 		4593F41C227B8E2500F57AE5 /* GADMAdapterAdColonyConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 4593F41B227B8E2500F57AE5 /* GADMAdapterAdColonyConstants.h */; };
-		45B4C1DE237B64340028D9E1 /* GADMAdapterAdColonyRTBInterstitialRenderer.h in Headers */ = {isa = PBXBuildFile; fileRef = 45B4C1DC237B642E0028D9E1 /* GADMAdapterAdColonyRTBInterstitialRenderer.h */; };
-		45B4C1DF237B64340028D9E1 /* GADMAdapterAdColonyRTBInterstitialRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B4C1DD237B64310028D9E1 /* GADMAdapterAdColonyRTBInterstitialRenderer.m */; };
 		45BFFBB522286EA400C96A67 /* GADMediationAdapterAdColony.m in Sources */ = {isa = PBXBuildFile; fileRef = 45BFFBB322286EA400C96A67 /* GADMediationAdapterAdColony.m */; };
 		45BFFBB822286EE100C96A67 /* GADMAdapterAdColonyInitializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 45BFFBB622286EE100C96A67 /* GADMAdapterAdColonyInitializer.h */; };
 		45BFFBB922286EE100C96A67 /* GADMAdapterAdColonyInitializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 45BFFBB722286EE100C96A67 /* GADMAdapterAdColonyInitializer.m */; };
@@ -85,12 +76,14 @@
 
 /* Begin PBXFileReference section */
 		0028CEDA22F0FC1D00151C65 /* Script_Validate.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = Script_Validate.sh; sourceTree = "<group>"; };
+		2306AE7526A7829B00494B68 /* GADMAdapterAdColonyRTBBannerRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GADMAdapterAdColonyRTBBannerRenderer.h; sourceTree = "<group>"; };
+		2306AE7626A7829B00494B68 /* GADMAdapterAdColonyRTBBannerRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GADMAdapterAdColonyRTBBannerRenderer.m; sourceTree = "<group>"; };
+		2306AE7726A7829B00494B68 /* GADMAdapterAdColonyRTBInterstitialRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GADMAdapterAdColonyRTBInterstitialRenderer.h; sourceTree = "<group>"; };
+		2306AE7826A7829B00494B68 /* GADMAdapterAdColonyRTBInterstitialRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GADMAdapterAdColonyRTBInterstitialRenderer.m; sourceTree = "<group>"; };
+		2306AE7926A7829B00494B68 /* GADMAdapterAdColonyRewardedRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GADMAdapterAdColonyRewardedRenderer.h; sourceTree = "<group>"; };
+		2306AE7A26A7829B00494B68 /* GADMAdapterAdColonyRewardedRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GADMAdapterAdColonyRewardedRenderer.m; sourceTree = "<group>"; };
 		4534E82022862B98000381F8 /* GADMediationAdapterAdColony.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GADMediationAdapterAdColony.h; sourceTree = "<group>"; };
-		45476078228612BC0041D40B /* GADMAdapterAdColonyRewardedRenderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GADMAdapterAdColonyRewardedRenderer.h; sourceTree = "<group>"; };
-		45476079228612BC0041D40B /* GADMAdapterAdColonyRewardedRenderer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GADMAdapterAdColonyRewardedRenderer.m; sourceTree = "<group>"; };
 		4593F41B227B8E2500F57AE5 /* GADMAdapterAdColonyConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GADMAdapterAdColonyConstants.h; sourceTree = "<group>"; };
-		45B4C1DC237B642E0028D9E1 /* GADMAdapterAdColonyRTBInterstitialRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GADMAdapterAdColonyRTBInterstitialRenderer.h; sourceTree = "<group>"; };
-		45B4C1DD237B64310028D9E1 /* GADMAdapterAdColonyRTBInterstitialRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GADMAdapterAdColonyRTBInterstitialRenderer.m; sourceTree = "<group>"; };
 		45BFFBB322286EA400C96A67 /* GADMediationAdapterAdColony.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GADMediationAdapterAdColony.m; sourceTree = "<group>"; };
 		45BFFBB622286EE100C96A67 /* GADMAdapterAdColonyInitializer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GADMAdapterAdColonyInitializer.h; sourceTree = "<group>"; };
 		45BFFBB722286EE100C96A67 /* GADMAdapterAdColonyInitializer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GADMAdapterAdColonyInitializer.m; sourceTree = "<group>"; };
@@ -102,7 +95,6 @@
 		7D6A68A31DB7ED230001E48B /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		7D6A68A41DB7ED310001E48B /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		7D9552B11DC006E5005DCE8D /* Script_Framework.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = Script_Framework.sh; sourceTree = "<group>"; };
-		7D9552B21DC006E5005DCE8D /* Script_Library.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = Script_Library.sh; sourceTree = "<group>"; };
 		7DC8681C1DDA8D4400F0F1C4 /* AdColonyAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdColonyAdapter.h; sourceTree = "<group>"; };
 		7DC8681F1DDA8D4400F0F1C4 /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		7DDEA93B1DFB30D200FCF905 /* GADMAdapterAdColonyExtras.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GADMAdapterAdColonyExtras.h; sourceTree = "<group>"; };
@@ -124,15 +116,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		454760732286125C0041D40B /* OpenBidding */ = {
+		2306AE7426A7829B00494B68 /* Bidding */ = {
 			isa = PBXGroup;
 			children = (
-				45476078228612BC0041D40B /* GADMAdapterAdColonyRewardedRenderer.h */,
-				45476079228612BC0041D40B /* GADMAdapterAdColonyRewardedRenderer.m */,
-				45B4C1DC237B642E0028D9E1 /* GADMAdapterAdColonyRTBInterstitialRenderer.h */,
-				45B4C1DD237B64310028D9E1 /* GADMAdapterAdColonyRTBInterstitialRenderer.m */,
+				2306AE7526A7829B00494B68 /* GADMAdapterAdColonyRTBBannerRenderer.h */,
+				2306AE7626A7829B00494B68 /* GADMAdapterAdColonyRTBBannerRenderer.m */,
+				2306AE7726A7829B00494B68 /* GADMAdapterAdColonyRTBInterstitialRenderer.h */,
+				2306AE7826A7829B00494B68 /* GADMAdapterAdColonyRTBInterstitialRenderer.m */,
+				2306AE7926A7829B00494B68 /* GADMAdapterAdColonyRewardedRenderer.h */,
+				2306AE7A26A7829B00494B68 /* GADMAdapterAdColonyRewardedRenderer.m */,
 			);
-			path = OpenBidding;
+			path = Bidding;
 			sourceTree = "<group>";
 		};
 		7D46CFDE1DB6B76E0050F612 /* Configuration */ = {
@@ -167,6 +161,7 @@
 		7DDEA93D1DFB30E600FCF905 /* AdColonyAdapter */ = {
 			isa = PBXGroup;
 			children = (
+				2306AE7426A7829B00494B68 /* Bidding */,
 				7DDEA93E1DFB30E600FCF905 /* GADMAdapterAdColony.h */,
 				7DDEA93F1DFB30E600FCF905 /* GADMAdapterAdColony.m */,
 				4593F41B227B8E2500F57AE5 /* GADMAdapterAdColonyConstants.h */,
@@ -176,7 +171,6 @@
 				45BFFBB622286EE100C96A67 /* GADMAdapterAdColonyInitializer.h */,
 				45BFFBB722286EE100C96A67 /* GADMAdapterAdColonyInitializer.m */,
 				45BFFBB322286EA400C96A67 /* GADMediationAdapterAdColony.m */,
-				454760732286125C0041D40B /* OpenBidding */,
 			);
 			path = AdColonyAdapter;
 			sourceTree = "<group>";
@@ -185,7 +179,6 @@
 			isa = PBXGroup;
 			children = (
 				7D264FF21DDD1B9400027720 /* README.md */,
-				7D9552B21DC006E5005DCE8D /* Script_Library.sh */,
 				7D9552B11DC006E5005DCE8D /* Script_Framework.sh */,
 				0028CEDA22F0FC1D00151C65 /* Script_Validate.sh */,
 			);
@@ -225,10 +218,11 @@
 				7DDEA9411DFB30E600FCF905 /* GADMAdapterAdColony.h in Headers */,
 				7DC8682E1DDA8D4400F0F1C4 /* AdColonyAdapter.h in Headers */,
 				4593F41C227B8E2500F57AE5 /* GADMAdapterAdColonyConstants.h in Headers */,
-				4547607A228612BC0041D40B /* GADMAdapterAdColonyRewardedRenderer.h in Headers */,
 				7DDEA93C1DFB30D200FCF905 /* GADMAdapterAdColonyExtras.h in Headers */,
+				2306AE7F26A7829B00494B68 /* GADMAdapterAdColonyRewardedRenderer.h in Headers */,
+				2306AE7D26A7829B00494B68 /* GADMAdapterAdColonyRTBInterstitialRenderer.h in Headers */,
 				45BFFBB822286EE100C96A67 /* GADMAdapterAdColonyInitializer.h in Headers */,
-				45B4C1DE237B64340028D9E1 /* GADMAdapterAdColonyRTBInterstitialRenderer.h in Headers */,
+				2306AE7B26A7829B00494B68 /* GADMAdapterAdColonyRTBBannerRenderer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -260,7 +254,7 @@
 		7DFABB151DA8682C00322E02 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1000;
+				LastUpgradeCheck = 1130;
 				ORGANIZATIONNAME = Google;
 				TargetAttributes = {
 					7D1B6CA21DC2ACF900D8CABF = {
@@ -269,18 +263,15 @@
 					7DFABB1C1DA8682C00322E02 = {
 						CreatedOnToolsVersion = 7.3.1;
 					};
-					7DFABB531DA86A1100322E02 = {
-						CreatedOnToolsVersion = 7.3.1;
-					};
 				};
 			};
 			buildConfigurationList = 7DFABB181DA8682C00322E02 /* Build configuration list for PBXProject "AdColonyAdapter" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
+				Base,
 			);
 			mainGroup = 7DFABB141DA8682C00322E02;
 			productRefGroup = 7DFABB1E1DA8682C00322E02 /* Products */;
@@ -288,7 +279,6 @@
 			projectRoot = "";
 			targets = (
 				7DFABB1C1DA8682C00322E02 /* Adapter */,
-				7DFABB531DA86A1100322E02 /* FatAdapter */,
 				7D1B6CA21DC2ACF900D8CABF /* Framework */,
 				0028CED522F0FB8100151C65 /* ValidateSourceCode */,
 			);
@@ -324,20 +314,6 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/BuildScript/Script_Framework.sh\"\n";
 		};
-		7DD2DCBD1DD12E3E00888FDB /* Static Library Script */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Static Library Script";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/BuildScript/Script_Library.sh\"\n";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -346,12 +322,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				45BFFBB922286EE100C96A67 /* GADMAdapterAdColonyInitializer.m in Sources */,
+				2306AE8026A7829B00494B68 /* GADMAdapterAdColonyRewardedRenderer.m in Sources */,
 				45BFFBC122286F4E00C96A67 /* GADMAdapterAdColonyHelper.m in Sources */,
+				2306AE7E26A7829B00494B68 /* GADMAdapterAdColonyRTBInterstitialRenderer.m in Sources */,
 				7DDEA9431DFB30E600FCF905 /* GADMAdapterAdColonyExtras.m in Sources */,
-				4547607B228612BC0041D40B /* GADMAdapterAdColonyRewardedRenderer.m in Sources */,
+				2306AE7C26A7829B00494B68 /* GADMAdapterAdColonyRTBBannerRenderer.m in Sources */,
 				45BFFBB522286EA400C96A67 /* GADMediationAdapterAdColony.m in Sources */,
 				7DDEA9421DFB30E600FCF905 /* GADMAdapterAdColony.m in Sources */,
-				45B4C1DF237B64340028D9E1 /* GADMAdapterAdColonyRTBInterstitialRenderer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -369,7 +346,6 @@
 		0028CED822F0FB8100151C65 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -377,7 +353,6 @@
 		0028CED922F0FB8100151C65 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -385,14 +360,12 @@
 		7D1B6CA41DC2ACF900D8CABF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 			};
 			name = Debug;
 		};
 		7D1B6CA51DC2ACF900D8CABF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 			};
 			name = Release;
 		};
@@ -401,17 +374,25 @@
 			baseConfigurationReference = 7D46CFDF1DB6B7CC0050F612 /* Adapter.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -434,7 +415,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 			};
@@ -445,17 +425,25 @@
 			baseConfigurationReference = 7D46CFDF1DB6B7CC0050F612 /* Adapter.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -472,7 +460,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -485,7 +472,6 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -497,22 +483,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				SKIP_INSTALL = YES;
-			};
-			name = Release;
-		};
-		7DFABB551DA86A1100322E02 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-			};
-			name = Debug;
-		};
-		7DFABB561DA86A1100322E02 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 			};
 			name = Release;
 		};
@@ -551,15 +522,6 @@
 			buildConfigurations = (
 				7DFABB271DA8682C00322E02 /* Debug */,
 				7DFABB281DA8682C00322E02 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		7DFABB541DA86A1100322E02 /* Build configuration list for PBXAggregateTarget "FatAdapter" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				7DFABB551DA86A1100322E02 /* Debug */,
-				7DFABB561DA86A1100322E02 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
