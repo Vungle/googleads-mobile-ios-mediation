@@ -204,6 +204,7 @@
   if ([clickableAssetViews[GADNativeIconAsset] isKindOfClass:[UIImageView class]]) {
     iconView = (UIImageView *)clickableAssetViews[GADNativeIconAsset];
   }
+  _mediaView.delegate = self;
   [_nativeAd registerViewForInteractionWithView:view
                                       mediaView:_mediaView
                                   iconImageView:iconView
@@ -265,12 +266,12 @@
   [_delegate didEndVideo];
 }
 
-- (void)mediaViewVideoDidmute:(MediaView *)mediaView {
-  [_delegate didMuteVideo];
-}
-
 - (void)mediaViewVideoDidUnmute:(MediaView *)mediaView {
   [_delegate didUnmuteVideo];
+}
+
+- (void)mediaViewVideoDidMute:(MediaView *)mediaView {
+  [_delegate didMuteVideo];
 }
 
 #pragma mark - GADMAdapterVungleDelegate
