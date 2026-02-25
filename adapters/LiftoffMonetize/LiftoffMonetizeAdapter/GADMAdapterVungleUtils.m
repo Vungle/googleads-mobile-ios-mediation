@@ -61,6 +61,53 @@ VungleAdSize *_Nonnull GADMAdapterVungleConvertGADAdSizeToVungleAdSize(
   }
 }
 
++ (void)logCustomSizeForBannerPlacement:(NSString *_Nonnull)placementId
+                                 adSize:(GADAdSize)adSize
+                           bannerViewAd:(VungleBannerView *_Nullable)adViewAd {
+  // For dev, will remove
+  NSString *adSizeName = nil;
+  if (GADAdSizeEqualToSize(adSize, GADAdSizeBanner)) {
+    adSizeName = @"GADAdSizeBanner (320x50)";
+  } else if (GADAdSizeEqualToSize(adSize, GADAdSizeLargeBanner)) {
+    adSizeName = @"GADAdSizeLargeBanner (320x100)";
+  } else if (GADAdSizeEqualToSize(adSize, GADAdSizeMediumRectangle)) {
+    adSizeName = @"GADAdSizeMediumRectangle (300x250)";
+  } else if (GADAdSizeEqualToSize(adSize, GADAdSizeFullBanner)) {
+    adSizeName = @"GADAdSizeFullBanner (468x60)";
+  } else if (GADAdSizeEqualToSize(adSize, GADAdSizeLeaderboard)) {
+    adSizeName = @"GADAdSizeLeaderboard (728x90)";
+  } else if (GADAdSizeEqualToSize(adSize, GADAdSizeSkyscraper)) {
+    adSizeName = @"GADAdSizeSkyscraper (120x600)";
+  } else if (GADAdSizeEqualToSize(adSize, GADAdSizeFluid)) {
+    adSizeName = @"GADAdSizeFluid";
+  } else if (GADAdSizeEqualToSize(adSize, GADAdSizeInvalid)) {
+    adSizeName = @"GADAdSizeInvalid";
+  } else {
+    NSLog(@"--->>> [VungleAdapter] logCustomSizeForBannerPlacement: placementId=%@ adSize=%@ (adaptive/custom)",placementId, NSStringFromGADAdSize(adSize));
+  }
+  NSLog(@"--->>> [VungleAdapter] logCustomSizeForBannerPlacement: placementId=%@ adSize=%@",placementId, adSizeName);
+  // For dev, will remove ---<<<
+
+  if (!GADAdSizeEqualToSize(adSize, GADAdSizeBanner) &&           // 320x50
+      !GADAdSizeEqualToSize(adSize, GADAdSizeLargeBanner) &&      // 320x100 // need to exclude?
+      !GADAdSizeEqualToSize(adSize, GADAdSizeMediumRectangle) &&  // 300x250
+      !GADAdSizeEqualToSize(adSize, GADAdSizeFullBanner) &&       // 468x60  // need to exclude?
+      !GADAdSizeEqualToSize(adSize, GADAdSizeLeaderboard) &&      // 728x90
+      !GADAdSizeEqualToSize(adSize, GADAdSizeSkyscraper) &&       // 120x600 // need to exclude?
+      !GADAdSizeEqualToSize(adSize, GADAdSizeFluid) &&            // fluid (dynamic height) // need to exclude?
+      ![VungleAdSize VungleValidAdSizeFromCGSizeWithSize:adSize.size placementId:placementId]) {
+    // Not a standard size — GADAdSizeInvalid or custom size
+    adViewAd.adapterAdFormat = @"GADMediationVungleBanner-custom";
+    NSString *adaptiveSizeMessage = [NSString stringWithFormat:@"CustomBannerSizeMismatch:w-%.0f|h-%.0f",
+                                     adSize.size.width,
+                                     adSize.size.height];
+    [VungleMediationLogger logErrorForAd:adViewAd message:adaptiveSizeMessage];
+
+    NSLog(@"Please use a Liftoff inline placement ID in order to use custom size banner: placementId=%@ adSize=%@",
+          placementId, NSStringFromGADAdSize(adSize));
+  }
+}
+
 #pragma mark - Safe Collection utility methods.
 
 void GADMAdapterVungleMutableSetAddObject(NSMutableSet *_Nullable set, NSObject *_Nonnull object) {

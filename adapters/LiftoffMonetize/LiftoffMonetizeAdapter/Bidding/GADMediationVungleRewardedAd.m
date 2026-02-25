@@ -82,6 +82,7 @@
 - (void)loadRewardedAd {
   _rewardedAd = [[VungleRewarded alloc] initWithPlacementId:self.desiredPlacement];
   _rewardedAd.delegate = self;
+  _rewardedAd.adapterAdFormat = @"GADMediationVungleRewardedAd";
   VungleAdsExtras *extras = [[VungleAdsExtras alloc] init];
   [extras setWithWatermark:[_adConfiguration.watermark base64EncodedStringWithOptions:0]];
   [_rewardedAd setWithExtras:extras];
