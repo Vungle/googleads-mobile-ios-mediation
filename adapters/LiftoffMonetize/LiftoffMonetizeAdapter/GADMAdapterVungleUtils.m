@@ -63,7 +63,7 @@ VungleAdSize *_Nonnull GADMAdapterVungleConvertGADAdSizeToVungleAdSize(
 
 + (void)logCustomSizeForBannerPlacement:(NSString *_Nonnull)placementId
                                  adSize:(GADAdSize)adSize
-                           bannerViewAd:(VungleBannerView *_Nullable)adViewAd {  // For dev, will remove
+                           bannerViewAd:(VungleBannerView *_Nullable)adViewAd {
   // Not a standard size case — GADAdSizeLargeBanner(320x100), GADAdSizeFullBanner(468x60),
   // GADAdSizeSkyscraper(120x600), GADAdSizeFluid, GADAdSizeInvalid, or custom size
   if (![VungleAds isInLine:placementId] &&
