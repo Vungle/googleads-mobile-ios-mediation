@@ -61,6 +61,27 @@ VungleAdSize *_Nonnull GADMAdapterVungleConvertGADAdSizeToVungleAdSize(
   }
 }
 
++ (void)logCustomSizeForBannerPlacement:(NSString *_Nonnull)placementId
+                                 adSize:(GADAdSize)adSize
+                           bannerViewAd:(VungleBannerView *_Nullable)adViewAd {
+  // Not a standard size case — GADAdSizeLargeBanner(320x100), GADAdSizeFullBanner(468x60),
+  // GADAdSizeSkyscraper(120x600), GADAdSizeFluid, GADAdSizeInvalid, or custom size
+  if (![VungleAds isInLine:placementId] &&
+      !GADAdSizeEqualToSize(adSize, GADAdSizeBanner) &&           // 320x50
+      !GADAdSizeEqualToSize(adSize, GADAdSizeMediumRectangle) &&  // 300x250
+      !GADAdSizeEqualToSize(adSize, GADAdSizeLeaderboard) ) {      // 728x90
+    
+    adViewAd.adapterAdFormat = @"GADMediationVungleBanner-custom";
+    NSString *adaptiveSizeMessage = [NSString stringWithFormat:@"CustomBannerSizeMismatch:w-%.0f|h-%.0f",
+                                     adSize.size.width,
+                                     adSize.size.height];
+    [VungleMediationLogger logErrorForAd:adViewAd message:adaptiveSizeMessage];
+
+    NSLog(@"Please use a Liftoff inline placement ID in order to use custom size banner: placementId=%@ adSize=%@",
+          placementId, NSStringFromGADAdSize(adSize));
+  }
+}
+
 #pragma mark - Safe Collection utility methods.
 
 void GADMAdapterVungleMutableSetAddObject(NSMutableSet *_Nullable set, NSObject *_Nonnull object) {
