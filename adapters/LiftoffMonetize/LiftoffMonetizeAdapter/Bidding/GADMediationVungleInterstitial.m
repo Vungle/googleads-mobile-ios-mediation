@@ -94,7 +94,7 @@
 - (void)loadAd {
   _interstitialAd = [[VungleInterstitial alloc] initWithPlacementId:self.desiredPlacement];
   _interstitialAd.delegate = self;
-  _interstitialAd.adapterAdFormat = @"GADMediationVungleInterstitial";
+  _interstitialAd.adapterAdFormat = NSStringFromClass(self.class);
   VungleAdsExtras *extras = [[VungleAdsExtras alloc] init];
   [extras setWithWatermark:[_adConfiguration.watermark base64EncodedStringWithOptions:0]];
   [_interstitialAd setWithExtras:extras];
