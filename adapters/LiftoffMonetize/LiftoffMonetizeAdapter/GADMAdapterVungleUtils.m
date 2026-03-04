@@ -64,20 +64,20 @@ VungleAdSize *_Nonnull GADMAdapterVungleConvertGADAdSizeToVungleAdSize(
 + (void)logCustomSizeForBannerPlacement:(NSString *_Nonnull)placementId
                                  adSize:(GADAdSize)adSize
                            bannerViewAd:(VungleBannerView *_Nullable)adViewAd {
-  // Not a standard size case — GADAdSizeLargeBanner(320x100), GADAdSizeFullBanner(468x60),
-  // GADAdSizeSkyscraper(120x600), GADAdSizeFluid, GADAdSizeInvalid, or custom size
+  // Size not supported for non-inline placements — may include GADAdSizeLargeBanner (320x100),
+  // GADAdSizeFullBanner (468x60), GADAdSizeSkyscraper (120x600), GADAdSizeFluid,
+  // GADAdSizeInvalid, or a custom size.
   if (![VungleAds isInLine:placementId] &&
       !GADAdSizeEqualToSize(adSize, GADAdSizeBanner) &&           // 320x50
       !GADAdSizeEqualToSize(adSize, GADAdSizeMediumRectangle) &&  // 300x250
-      !GADAdSizeEqualToSize(adSize, GADAdSizeLeaderboard) ) {      // 728x90
-    
+      !GADAdSizeEqualToSize(adSize, GADAdSizeLeaderboard)) {      // 728x90
     adViewAd.adapterAdFormat = @"GADMediationVungleBanner-custom";
-    NSString *adaptiveSizeMessage = [NSString stringWithFormat:@"CustomBannerSizeMismatch:w-%.0f|h-%.0f",
-                                     adSize.size.width,
-                                     adSize.size.height];
-    [VungleMediationLogger logErrorForAd:adViewAd message:adaptiveSizeMessage];
-
-    NSLog(@"Please use a Liftoff inline placement ID in order to use custom size banner: placementId=%@ adSize=%@",
+    NSString *customSizeMismatchMessage =
+        [NSString stringWithFormat:@"CustomBannerSizeMismatch:w-%.0f|h-%.0f",
+                                   adSize.size.width, adSize.size.height];
+    [VungleMediationLogger logErrorForAd:adViewAd message:customSizeMismatchMessage];
+    NSLog(@"Banner size is unsupported for non-inline Liftoff placements. "
+          @"Use a Liftoff inline placement ID to serve this banner size: placementId=%@ adSize=%@",
           placementId, NSStringFromGADAdSize(adSize));
   }
 }
