@@ -71,7 +71,7 @@ VungleAdSize *_Nonnull GADMAdapterVungleConvertGADAdSizeToVungleAdSize(
       !GADAdSizeEqualToSize(adSize, GADAdSizeBanner) &&           // 320x50
       !GADAdSizeEqualToSize(adSize, GADAdSizeMediumRectangle) &&  // 300x250
       !GADAdSizeEqualToSize(adSize, GADAdSizeLeaderboard)) {      // 728x90
-    adViewAd.adapterAdFormat = @"GADMediationVungleBanner-custom";
+    adViewAd.adapterAdFormat = [adViewAd.adapterAdFormat stringByAppendingString:@"-custom"];
     NSString *customSizeMismatchMessage =
         [NSString stringWithFormat:@"CustomBannerSizeMismatch:w-%.0f|h-%.0f",
                                    adSize.size.width, adSize.size.height];
