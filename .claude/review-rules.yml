@@ -1,0 +1,27 @@
+review_rules:
+  - path: "adapters/**/*.{h,m}"
+    rules:
+      - Main adapter class must implement GADMediationAdapter protocol
+      - Router class must handle shared SDK state and delegate routing correctly
+      - All callbacks must dispatch to main queue via GCD
+      - Nullability annotations required on all public header declarations
+      - Early return pattern preferred over deep nesting
+      - Bidding and waterfall classes must be separate implementations
+
+  - path: "adapters/**/*Router*.{h,m}"
+    rules:
+      - Router must be a singleton or shared instance
+      - Must correctly route callbacks to the originating ad request
+      - Must handle concurrent ad requests for different placements
+      - SDK initialization state must be tracked and reused
+
+  - path: "**/*.sh"
+    rules:
+      - xcframework build scripts must handle both device and simulator architectures
+      - Scripts must clean build artifacts before rebuilding
+      - Output path must be clearly defined and consistent
+
+  - path: "adapters/**/CHANGELOG.md"
+    rules:
+      - Every version bump must have a corresponding CHANGELOG entry
+      - Entries should note SDK version updates, new format support, and bug fixes

@@ -1,0 +1,39 @@
+conventions:
+  - id: adapter-structure
+    description: >
+      Each network adapter lives under adapters/{Network}/{Network}Adapter/.
+      Main adapter class: GADMediation{Network}Adapter. Router class manages
+      shared SDK lifecycle. Format-specific classes handle banner, interstitial,
+      and rewarded individually. Bidding has separate implementation classes.
+    applies_to: "adapters/**/*.{h,m}"
+
+  - id: naming-conventions
+    description: >
+      Main adapter: GADMediation{Network}Adapter. Router:
+      GADMediation{Network}Router. Format classes include the network name
+      and format (e.g., GAD{Network}InterstitialAd). Nullability annotations
+      required on all public headers. Objective-C naming conventions throughout.
+    applies_to: "adapters/**/*.{h,m}"
+
+  - id: ad-format-support
+    description: >
+      Adapters support Banner, Interstitial, and Rewarded Video at minimum.
+      Bidding variants have separate classes. Each format class handles its
+      own delegate callbacks. Consent handling is integrated where required
+      by the network SDK.
+    applies_to: "adapters/**/*.m"
+
+  - id: version-management
+    description: >
+      Each adapter has independent versioning. The adapter version encodes
+      the underlying SDK version. CHANGELOG.md per adapter tracks changes.
+      xcframework build scripts produce distributable binaries.
+    applies_to: "adapters/**/*"
+
+  - id: xcframework-build
+    description: >
+      Build scripts produce xcframework bundles for multi-architecture
+      distribution (device + simulator). Scripts handle lipo, xcodebuild,
+      and framework assembly. Output frameworks are used for binary
+      distribution alongside source.
+    applies_to: "**/*.sh"
