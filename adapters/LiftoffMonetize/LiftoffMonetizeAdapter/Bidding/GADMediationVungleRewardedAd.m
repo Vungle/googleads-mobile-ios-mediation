@@ -34,6 +34,10 @@
 
   /// Liftoff Monetize rewarded ad instance.
   VungleRewarded *_rewardedAd;
+
+  /// Publisher's reporting-data handler, captured at request time so it always corresponds to
+  /// this ad request even if the extras object is reused across requests.
+  void (^_publisherReportDataHandler)(NSDictionary<NSString *, id> *_Nonnull);
 }
 
 @synthesize desiredPlacement;
@@ -44,6 +48,10 @@
   self = [super init];
   if (self) {
     _adConfiguration = adConfiguration;
+    if ([adConfiguration.extras isKindOfClass:[VungleAdNetworkExtras class]]) {
+      VungleAdNetworkExtras *extras = (VungleAdNetworkExtras *)adConfiguration.extras;
+      _publisherReportDataHandler = [extras.publisherReportDataHandler copy];
+    }
 
     __block atomic_flag adLoadHandlerCalled = ATOMIC_FLAG_INIT;
     __block GADMediationRewardedLoadCompletionHandler origAdLoadHandler = [handler copy];
@@ -110,6 +118,8 @@
 #pragma mark - VungleRewardedDelegate
 
 - (void)rewardedAdDidLoad:(nonnull VungleRewarded *)rewarded {
+  [GADMAdapterVungleUtils deliverPublisherReportData:rewarded.publisherReporting
+                                             handler:_publisherReportDataHandler];
   if (_adLoadCompletionHandler) {
     _delegate = _adLoadCompletionHandler(self, nil);
   }

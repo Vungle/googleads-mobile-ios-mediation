@@ -40,4 +40,10 @@ void GADMAdapterVungleMutableSetAddObject(NSMutableSet *_Nullable set, NSObject 
 /// Updates the Vungle COPPA status if needed.
 + (void)updateVungleCOPPAStatusIfNeeded;
 
+/// Invokes |handler| on the main thread with |reportData|, the loaded ad's publisher
+/// reporting data, delivered unmodified. No-op if |handler| or |reportData| is nil.
++ (void)deliverPublisherReportData:(nullable NSDictionary<NSString *, id> *)reportData
+                           handler:(void (^_Nullable)(
+                                       NSDictionary<NSString *, id> *_Nonnull))handler;
+
 @end

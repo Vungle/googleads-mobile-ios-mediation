@@ -32,4 +32,17 @@
  */
 @property(nonatomic, assign) GADAdChoicesPosition nativeAdOptionPosition;
 
+/*!
+ * @brief Block called on the main thread when a Liftoff Monetize ad loads, just before the
+ * Google Mobile Ads SDK load-success callback, with the Liftoff publisher reporting data for
+ * that ad.
+ * @discussion Optional. The dictionary is delivered as received from the Liftoff ad server;
+ * the key set is agreed per publisher integration. The handler is not called when Liftoff
+ * does not fill the request, when another network wins the mediation auction, or when the ad
+ * response contains no reporting data. Capture self weakly inside the block to avoid retain
+ * cycles.
+ */
+@property(nonatomic, copy) void (^_Nullable publisherReportDataHandler)
+    (NSDictionary<NSString *, id> *_Nonnull reportData);
+
 @end

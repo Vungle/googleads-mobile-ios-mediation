@@ -35,6 +35,10 @@
   /// Liftoff Monetize app open ad instance. Note: Liftoff uses VungleInterstitial for displaying
   /// app open ads.
   VungleInterstitial *_appOpenAd;
+
+  /// Publisher's reporting-data handler, captured at request time so it always corresponds to
+  /// this ad request even if the extras object is reused across requests.
+  void (^_publisherReportDataHandler)(NSDictionary<NSString *, id> *_Nonnull);
 }
 
 @synthesize desiredPlacement;
@@ -50,6 +54,10 @@
     _adConfiguration = adConfiguration;
     _isLoadCompletionHandlerCalled = NO;
     _loadCompletionHandler = [loadCompletionHandler copy];
+    if ([adConfiguration.extras isKindOfClass:[VungleAdNetworkExtras class]]) {
+      VungleAdNetworkExtras *extras = (VungleAdNetworkExtras *)adConfiguration.extras;
+      _publisherReportDataHandler = [extras.publisherReportDataHandler copy];
+    }
   }
   return self;
 }
@@ -136,6 +144,8 @@
 #pragma mark - VungleInterstitialDelegate
 
 - (void)interstitialAdDidLoad:(nonnull VungleInterstitial *)appOpenAd {
+  [GADMAdapterVungleUtils deliverPublisherReportData:appOpenAd.publisherReporting
+                                             handler:_publisherReportDataHandler];
   [self callLoadCompletionHandlerIfNeededWithAd:self error:nil];
 }
 
