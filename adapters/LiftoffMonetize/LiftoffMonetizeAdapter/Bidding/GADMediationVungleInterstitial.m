@@ -36,6 +36,10 @@
 
   /// Liftoff Monetize interstitial ad instance.
   VungleInterstitial *_interstitialAd;
+
+  /// Publisher's reporting-data handler, captured at request time so it always corresponds to
+  /// this ad request even if the extras object is reused across requests.
+  void (^_publisherReportDataHandler)(NSDictionary<NSString *, id> *_Nonnull);
 }
 
 @synthesize desiredPlacement;
@@ -51,6 +55,10 @@
     _adConfiguration = adConfiguration;
     self.desiredPlacement =
         [GADMAdapterVungleUtils findPlacement:adConfiguration.credentials.settings];
+    if ([adConfiguration.extras isKindOfClass:[VungleAdNetworkExtras class]]) {
+      VungleAdNetworkExtras *extras = (VungleAdNetworkExtras *)adConfiguration.extras;
+      _publisherReportDataHandler = [extras.publisherReportDataHandler copy];
+    }
 
     __block atomic_flag adLoadHandlerCalled = ATOMIC_FLAG_INIT;
     __block GADMediationInterstitialLoadCompletionHandler origAdLoadHandler =
@@ -104,6 +112,8 @@
 #pragma mark - VungleInterstitialDelegate
 
 - (void)interstitialAdDidLoad:(nonnull VungleInterstitial *)interstitial {
+  [GADMAdapterVungleUtils deliverPublisherReportData:interstitial.publisherReporting
+                                             handler:_publisherReportDataHandler];
   if (_adLoadCompletionHandler) {
     _delegate = _adLoadCompletionHandler(self, nil);
   }

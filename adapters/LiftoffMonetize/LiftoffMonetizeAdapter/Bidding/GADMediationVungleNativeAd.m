@@ -39,6 +39,10 @@
 
   /// The Liftoff Monetize container to display the media (image/video).
   MediaView *_mediaView;
+
+  /// Publisher's reporting-data handler, captured at request time so it always corresponds to
+  /// this ad request even if the extras object is reused across requests.
+  void (^_publisherReportDataHandler)(NSDictionary<NSString *, id> *_Nonnull);
 }
 
 @synthesize desiredPlacement;
@@ -58,6 +62,10 @@
   self = [super init];
   if (self) {
     _adConfiguration = adConfiguration;
+    if ([adConfiguration.extras isKindOfClass:[VungleAdNetworkExtras class]]) {
+      VungleAdNetworkExtras *extras = (VungleAdNetworkExtras *)adConfiguration.extras;
+      _publisherReportDataHandler = [extras.publisherReportDataHandler copy];
+    }
 
     // Store the ad config and completion handler for later use.
     __block atomic_flag adLoadHandlerCalled = ATOMIC_FLAG_INIT;
@@ -233,6 +241,8 @@
     return;
   }
 
+  [GADMAdapterVungleUtils deliverPublisherReportData:nativeAd.publisherReporting
+                                             handler:_publisherReportDataHandler];
   _mediaView = [[MediaView alloc] init];
   _delegate = _adLoadCompletionHandler(self, nil);
 }

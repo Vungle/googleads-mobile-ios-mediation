@@ -39,6 +39,10 @@
 
   /// Liftoff Monetize bannerView ad instance.
   VungleBannerView *_bannerAdView;
+
+  /// Publisher's reporting-data handler, captured at request time so it always corresponds to
+  /// this ad request even if the extras object is reused across requests.
+  void (^_publisherReportDataHandler)(NSDictionary<NSString *, id> *_Nonnull);
 }
 
 @synthesize desiredPlacement;
@@ -60,6 +64,10 @@
 
     self.desiredPlacement =
         [GADMAdapterVungleUtils findPlacement:adConfiguration.credentials.settings];
+    if ([adConfiguration.extras isKindOfClass:[VungleAdNetworkExtras class]]) {
+      VungleAdNetworkExtras *extras = (VungleAdNetworkExtras *)adConfiguration.extras;
+      _publisherReportDataHandler = [extras.publisherReportDataHandler copy];
+    }
 
     __block atomic_flag adLoadHandlerCalled = ATOMIC_FLAG_INIT;
     __block GADMediationBannerLoadCompletionHandler origAdLoadHandler = [completionHandler copy];
@@ -109,6 +117,8 @@
 #pragma mark - VungleBannerViewDelegate
 
 - (void)bannerAdDidLoad:(VungleBannerView *)bannerView {
+  [GADMAdapterVungleUtils deliverPublisherReportData:bannerView.publisherReporting
+                                             handler:_publisherReportDataHandler];
   if (_adLoadCompletionHandler) {
     _delegate = _adLoadCompletionHandler(self, nil);
   }

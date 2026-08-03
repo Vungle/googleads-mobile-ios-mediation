@@ -85,6 +85,24 @@ VungleAdSize *_Nonnull GADMAdapterVungleConvertGADAdSizeToVungleAdSize(
   }
 }
 
++ (void)deliverPublisherReportData:(nullable NSDictionary<NSString *, id> *)reportData
+                           handler:(void (^_Nullable)(
+                                       NSDictionary<NSString *, id> *_Nonnull))handler {
+  if (!handler || !reportData) {
+    // Missing report data means the publisher is not enrolled / the field is absent from
+    // the ad response — expected, not an error.
+    return;
+  }
+  if (NSThread.isMainThread) {
+    handler(reportData);
+  } else {
+    // Defensive: the Vungle SDK fires its load callbacks on the main thread already.
+    dispatch_async(dispatch_get_main_queue(), ^{
+      handler(reportData);
+    });
+  }
+}
+
 #pragma mark - Safe Collection utility methods.
 
 void GADMAdapterVungleMutableSetAddObject(NSMutableSet *_Nullable set, NSObject *_Nonnull object) {
